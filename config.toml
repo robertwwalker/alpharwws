@@ -97,39 +97,3 @@ enableEmoji = true
 
   [services.twitter]
     disableInlineCSS = false
-    
-## Menu Settings
-[menu]
-  [[menu.main]]
-    identifier = "blog"
-    name = "Blog"
-    url = "/blog/"
-    weight = 10
-  [[menu.main]]
-    identifier = "courses"
-    name = "Courses"
-    url = "/courses/"
-    weight = 20
-  [[menu.main]]
-    identifier = "taxonomies"
-    name = "Taxonomies"
-    url = "#"
-    weight = 30
-  [[menu.main]]
-    parent = "taxonomies"
-    identifier = "categories"
-    name = "Categories"
-    url = "/categories/"
-    weight = 31
-  [[menu.main]]
-    parent = "taxonomies"
-    identifier = "tags"
-    name = "Tags"
-    url = "/tags/"
-    weight = 31
-  [[menu.main]]
-    parent = "taxonomies"
-    identifier = "series"
-    name = "Series"
-    url = "/series/"
-    weight = 33

@@ -1,6 +1,6 @@
 ---
 title: Socrata is amazingly handy for open data
-author: RWW
+authors: ["RWW"]
 date: '2020-11-25'
 slug: socrata-is-amazingly-handy-for-open-data
 categories:
@@ -8,7 +8,6 @@ categories:
 tags: []
 subtitle: ''
 summary: ''
-authors: []
 lastmod: '2020-11-25T13:16:28-08:00'
 featured: no
 image:
@@ -18,39 +17,45 @@ image:
 projects: []
 ---
 
-<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
 <script src="{{< blogdown/postref >}}index.en_files/kePrint/kePrint.js"></script>
 <link href="{{< blogdown/postref >}}index.en_files/lightable/lightable.css" rel="stylesheet" />
 <script src="{{< blogdown/postref >}}index.en_files/htmlwidgets/htmlwidgets.js"></script>
 <script src="{{< blogdown/postref >}}index.en_files/pymjs/pym.v1.js"></script>
 <script src="{{< blogdown/postref >}}index.en_files/widgetframe-binding/widgetframe.js"></script>
 
+The Socrata package makes it easy to access API calls built around SODA for open data access. If you try to skip the Socrata part, you usually only get a fraction of the available data. Socrata is intended to make open access data easier to manage and many government entities in the US use it as the portal to public data access. The R package makes interfacing with it much easier. First, how can we install it? It is on CRAN.
 
-<p>The Socrata package makes it easy to access API calls built around SODA for open data access. If you try to skip the Socrata part, you usually only get a fraction of the available data. Socrata is intended to make open access data easier to manage and many government entities in the US use it as the portal to public data access. The R package makes interfacing with it much easier. First, how can we install it? It is on CRAN.</p>
-<pre><code>install.packages(&quot;RSocrata&quot;)
-library(RSocrata)
-SchoolSpend &lt;- read.socrata(&quot;https://data.oregon.gov/resource/c7av-ntdz.csv&quot;)</code></pre>
-<p>The first bit of data that I found details various bits about spending and students in Oregon school districts. I want to look at a few basics of this. There is a lot more to plot but this is enough for now.</p>
-<div id="the-data" class="section level2">
-<h2>The Data</h2>
-<p>I found this on Oregon’s open data portal. What do I have?</p>
-<pre class="r"><code>library(skimr)
-skim(SchoolSpend) %&gt;% kable() %&gt;% scroll_box(width=&quot;100%&quot;)</code></pre>
+    install.packages("RSocrata")
+    library(RSocrata)
+    SchoolSpend <- read.socrata("https://data.oregon.gov/resource/c7av-ntdz.csv")
+
+The first bit of data that I found details various bits about spending and students in Oregon school districts. I want to look at a few basics of this. There is a lot more to plot but this is enough for now.
+
+## The Data
+
+I found this on Oregon’s open data portal. What do I have?
+
+``` r
+library(skimr)
+skim(SchoolSpend) %>% kable() %>% scroll_box(width="100%")
+```
+
 <div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+
 <table>
 <thead>
 <tr>
 <th style="text-align:left;">
-skim_type
+skim\_type
 </th>
 <th style="text-align:left;">
-skim_variable
+skim\_variable
 </th>
 <th style="text-align:right;">
-n_missing
+n\_missing
 </th>
 <th style="text-align:right;">
-complete_rate
+complete\_rate
 </th>
 <th style="text-align:right;">
 character.min
@@ -62,7 +67,7 @@ character.max
 character.empty
 </th>
 <th style="text-align:right;">
-character.n_unique
+character.n\_unique
 </th>
 <th style="text-align:right;">
 character.whitespace
@@ -99,7 +104,7 @@ numeric.hist
 character
 </td>
 <td style="text-align:left;">
-county_name
+county\_name
 </td>
 <td style="text-align:right;">
 0
@@ -152,7 +157,7 @@ NA
 character
 </td>
 <td style="text-align:left;">
-district_number
+district\_number
 </td>
 <td style="text-align:right;">
 0
@@ -205,7 +210,7 @@ NA
 character
 </td>
 <td style="text-align:left;">
-school_year
+school\_year
 </td>
 <td style="text-align:right;">
 0
@@ -258,7 +263,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-district_id
+district\_id
 </td>
 <td style="text-align:right;">
 0
@@ -311,7 +316,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-operating_cost_per_student
+operating\_cost\_per\_student
 </td>
 <td style="text-align:right;">
 0
@@ -364,7 +369,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-student_count
+student\_count
 </td>
 <td style="text-align:right;">
 0
@@ -417,7 +422,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-state_student_count
+state\_student\_count
 </td>
 <td style="text-align:right;">
 0
@@ -470,7 +475,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-operating_cost
+operating\_cost
 </td>
 <td style="text-align:right;">
 0
@@ -512,7 +517,7 @@ NA
 22617257.11
 </td>
 <td style="text-align:right;">
-513891919.14
+513891919\.14
 </td>
 <td style="text-align:left;">
 ▇▁▁▁▁
@@ -523,7 +528,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-state_operating_cost
+state\_operating\_cost
 </td>
 <td style="text-align:right;">
 0
@@ -550,10 +555,10 @@ NA
 4337006498.569
 </td>
 <td style="text-align:right;">
-697307559.8432
+697307559\.8432
 </td>
 <td style="text-align:right;">
-948447366.8
+948447366\.8
 </td>
 <td style="text-align:right;">
 3889552066.13
@@ -576,7 +581,7 @@ NA
 numeric
 </td>
 <td style="text-align:left;">
-state_operating_cost_per_student
+state\_operating\_cost\_per\_student
 </td>
 <td style="text-align:right;">
 0
@@ -626,51 +631,73 @@ NA
 </tr>
 </tbody>
 </table>
+
 </div>
-</div>
-<div id="how-many-school-districts-per-county" class="section level2">
-<h2>How many school districts per county?</h2>
-<pre class="r"><code>library(magrittr); library(hrbrthemes)
-SchoolSpend %&gt;% group_by(county_name, school_year) %&gt;% tally() %&gt;% mutate(school_year = as.Date(school_year, format = &quot;%m/%d/%Y&quot;)) %&gt;% filter(school_year == max(school_year)) %&gt;% ggplot() + aes(x=fct_reorder(county_name, n), y=n, fill=county_name) + geom_col() + coord_flip() + guides(fill=FALSE) + labs(x= &quot;County&quot;, y=&quot;Number of School Districts&quot;) + theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-</div>
-<div id="by-students" class="section level2">
-<h2>By Students?</h2>
-<pre class="r"><code>SchoolSpend %&gt;% group_by(county_name) %&gt;% mutate(school_year = as.Date(school_year, format = &quot;%m/%d/%Y&quot;)) %&gt;% filter(school_year == max(school_year)) %&gt;% summarise(Students = sum(student_count), Year = mean(school_year), County = as.factor(county_name)) %&gt;% unique() -&gt; Dat
-ggplot(Dat) + aes(x=fct_reorder(County, -Students), y=Students, fill=county_name) + geom_col() + coord_flip() + guides(fill=FALSE) + labs(x= &quot;County&quot;, y=&quot;Students&quot;) + theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>There are a number of other bits of data organized by year and district. There is certainly more to examine, but then I found this.</p>
-</div>
-<div id="voter-registration-data" class="section level1">
-<h1>Voter Registration Data</h1>
-<p>The database of Voter Registrations in Oregon is also available and easily accessible.</p>
-<pre class="r"><code>VoterReg &lt;- read.socrata(&quot;https://data.oregon.gov/resource/6a4f-ecbi.csv&quot;)
-VoterReg %&gt;% filter(sysdate == &quot;2020-11-03&quot;) %&gt;% group_by(county) %&gt;% summarise(Voters = sum(count_v_id)) %&gt;% ggplot(., aes(x=fct_reorder(county, Voters), y=Voters, label=Voters)) + geom_col(fill=&quot;white&quot;, color=&quot;skyblue&quot;) + geom_text(size=2.2) + coord_flip() + labs(x=&quot;County&quot;, y=&quot;Registered Voters&quot;) + theme_minimal() -&gt; Plot1
-Plot1</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-<pre class="r"><code>library(plotly); library(widgetframe)
-ggp1 &lt;- ggplotly(Plot1)
-frameWidget(ggp1)</code></pre>
+
+## How many school districts per county?
+
+``` r
+library(magrittr); library(hrbrthemes)
+SchoolSpend %>% group_by(county_name, school_year) %>% tally() %>% mutate(school_year = as.Date(school_year, format = "%m/%d/%Y")) %>% filter(school_year == max(school_year)) %>% ggplot() + aes(x=fct_reorder(county_name, n), y=n, fill=county_name) + geom_col() + coord_flip() + guides(fill=FALSE) + labs(x= "County", y="Number of School Districts") + theme_minimal()
+```
+
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-2-1.png" width="672" />
+
+## By Students?
+
+``` r
+SchoolSpend %>% group_by(county_name) %>% mutate(school_year = as.Date(school_year, format = "%m/%d/%Y")) %>% filter(school_year == max(school_year)) %>% summarise(Students = sum(student_count), Year = mean(school_year), County = as.factor(county_name)) %>% unique() -> Dat
+ggplot(Dat) + aes(x=fct_reorder(County, -Students), y=Students, fill=county_name) + geom_col() + coord_flip() + guides(fill=FALSE) + labs(x= "County", y="Students") + theme_minimal()
+```
+
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" />
+
+There are a number of other bits of data organized by year and district. There is certainly more to examine, but then I found this.
+
+# Voter Registration Data
+
+The database of Voter Registrations in Oregon is also available and easily accessible.
+
+``` r
+VoterReg <- read.socrata("https://data.oregon.gov/resource/6a4f-ecbi.csv")
+VoterReg %>% filter(sysdate == "2020-11-03") %>% group_by(county) %>% summarise(Voters = sum(count_v_id)) %>% ggplot(., aes(x=fct_reorder(county, Voters), y=Voters, label=Voters)) + geom_col(fill="white", color="skyblue") + geom_text(size=2.2) + coord_flip() + labs(x="County", y="Registered Voters") + theme_minimal() -> Plot1
+Plot1
+```
+
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+
+``` r
+library(plotly); library(widgetframe)
+ggp1 <- ggplotly(Plot1)
+frameWidget(ggp1)
+```
+
 <div id="htmlwidget-1" style="width:100%;height:480px;" class="widgetframe html-widget"></div>
 <script type="application/json" data-for="htmlwidget-1">{"x":{"url":"index.en_files/figure-html//widgets/widget_Plotly1.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
-<div id="the-balance-of-registrations" class="section level2">
-<h2>The Balance of Registrations</h2>
-<pre class="r"><code>CurrVR &lt;- VoterReg %&gt;% filter(sysdate == &quot;2020-11-03&quot;)
-CurrVR$DRE &lt;- &quot;Other&quot;
-CurrVR$DRE[CurrVR$party==&quot;Democrat&quot;] &lt;- &quot;Democrat&quot;
-CurrVR$DRE[CurrVR$party==&quot;Republican&quot;] &lt;- &quot;Republican&quot;
-CurrVR %&gt;% group_by(county) %&gt;% mutate(Voters = sum(count_v_id)) %&gt;% ggplot(., aes(x=fct_reorder(county, Voters), y=Voters, label=Voters)) + geom_col() + geom_text(size=2.2) + coord_flip() + labs(x=&quot;County&quot;, y=&quot;Registered Voters&quot;) + theme_minimal()</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-</div>
-<div id="the-plot-by-party" class="section level2">
-<h2>The Plot by Party</h2>
-<p>Now let me split these up by grouping and plot them.</p>
-<pre class="r"><code>CurrVR %&gt;% group_by(county, DRE) %&gt;% summarise(Voters = sum(count_v_id)) %&gt;%
+
+## The Balance of Registrations
+
+``` r
+CurrVR <- VoterReg %>% filter(sysdate == "2020-11-03")
+CurrVR$DRE <- "Other"
+CurrVR$DRE[CurrVR$party=="Democrat"] <- "Democrat"
+CurrVR$DRE[CurrVR$party=="Republican"] <- "Republican"
+CurrVR %>% group_by(county) %>% mutate(Voters = sum(count_v_id)) %>% ggplot(., aes(x=fct_reorder(county, Voters), y=Voters, label=Voters)) + geom_col() + geom_text(size=2.2) + coord_flip() + labs(x="County", y="Registered Voters") + theme_minimal()
+```
+
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+
+## The Plot by Party
+
+Now let me split these up by grouping and plot them.
+
+``` r
+CurrVR %>% group_by(county, DRE) %>% summarise(Voters = sum(count_v_id)) %>%
 ggplot(.) +
  aes(x = fct_reorder(county, Voters), y=Voters, fill = DRE) +
  geom_col() + scale_fill_viridis_d() +
  coord_flip() +
- theme_minimal() + labs(x=&quot;County&quot;)</code></pre>
-<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-</div>
-</div>
+ theme_minimal() + labs(x="County")
+```
+
+<img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-6-1.png" width="672" />

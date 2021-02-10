@@ -27,7 +27,7 @@ I love this intro photo from the tidyTuesday page.
 
 ![](https://camo.githubusercontent.com/0c831f8d61fee52c54b4edf861012ea51643195f/68747470733a2f2f776f726470726573732e736d6172746c6f6f6b2e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031382f30312f676470722e706e67)
 
-This week's tidyTuesday data cover violations of the GDPR (General Data Protection Regulations) regulatory regime for data privacy in the European Union.  [The Wikipedia entry on GDPR](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) is fairly extensive.  The dataset is large and suggests some interesting regulatory arbitrage.  Let's have a look at the data.  First, let's load them.
+This week's tidyTuesday data cover violations of the GDPR (General Data Protection Regulations) regulatory regime for data privacy in the European Union.  [The Wikipedia entry on GDPR](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) is fairly extensive.  The dataset is large and suggests some interesting regulatory arbitrage.  Some countries have far more violations; others have a large number but vary considerably in size of fine.  Let's have a look at the data.  First, let's load them.
 
 ```{r}
 gdpr_violations <- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_violations.tsv')

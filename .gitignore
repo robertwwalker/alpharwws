@@ -4,3 +4,5 @@
 .Ruserdata
 .DS-Store
 .Rprofile
+/public/
+/resources/

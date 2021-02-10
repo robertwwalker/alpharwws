@@ -14,22 +14,6 @@ disqusShortname = ""
   design = "Design: [HTML5 UP](http://html5up.net/)"
   mainSections = ["blog","courses"]
 
-### Footer Social Media Links ###
-[[params.share]]
-title = "facebook"
-icon = "fa-facebook-f" # fontawesome icons https://fontawesome.com/icons?d=gallery&s=brands
-link = "https://www.facebook.com/"
-
-[[params.share]]
-title = "twitter"
-icon = "fa-twitter"
-link = "https://twitter.com/PieRatio"
-
-[[params.share]]
-title = "linkedin"
-icon = "fa-linkedin"
-link = "https://www.linkedin.com"
-
 #[params]
 #  description = "rww.science"
 #  mainSections = ["post"]

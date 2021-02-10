@@ -21,16 +21,21 @@ image:
 projects: []
 ---
 
-<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+## R Markdown
+
+I love this intro photo from the tidyTuesday page.
+
+![](https://camo.githubusercontent.com/0c831f8d61fee52c54b4edf861012ea51643195f/68747470733a2f2f776f726470726573732e736d6172746c6f6f6b2e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031382f30312f676470722e706e67)
+
+This week's tidyTuesday data cover violations of the GDPR (General Data Protection Regulations) regulatory regime for data privacy in the European Union.  [The Wikipedia entry on GDPR](https://en.wikipedia.org/wiki/General_Data_Protection_Regulation) is fairly extensive.  The dataset is large and suggests some interesting regulatory arbitrage.  Some countries have far more violations; others have a large number but vary considerably in size of fine.  Let's have a look at the data.  First, let's load them.
 
 
-<div id="r-markdown" class="section level2">
-<h2>R Markdown</h2>
-<p>I love this intro photo from the tidyTuesday page.</p>
-<p><img src="https://camo.githubusercontent.com/0c831f8d61fee52c54b4edf861012ea51643195f/68747470733a2f2f776f726470726573732e736d6172746c6f6f6b2e636f6d2f77702d636f6e74656e742f75706c6f6164732f323031382f30312f676470722e706e67" /></p>
-<p>This week’s tidyTuesday data cover violations of the GDPR (General Data Protection Regulations) regulatory regime for data privacy in the European Union. <a href="https://en.wikipedia.org/wiki/General_Data_Protection_Regulation">The Wikipedia entry on GDPR</a> is fairly extensive. The dataset is large and suggests some interesting regulatory arbitrage. Let’s have a look at the data. First, let’s load them.</p>
-<pre class="r"><code>gdpr_violations &lt;- readr::read_tsv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_violations.tsv&#39;)</code></pre>
-<pre><code>## 
+```r
+gdpr_violations <- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_violations.tsv')
+```
+
+```
+## 
 ## ── Column specification ────────────────────────────────────────────────────────
 ## cols(
 ##   id = col_double(),
@@ -44,9 +49,15 @@ projects: []
 ##   type = col_character(),
 ##   source = col_character(),
 ##   summary = col_character()
-## )</code></pre>
-<pre class="r"><code>gdpr_text &lt;- readr::read_tsv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_text.tsv&#39;)</code></pre>
-<pre><code>## 
+## )
+```
+
+```r
+gdpr_text <- readr::read_tsv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-04-21/gdpr_text.tsv')
+```
+
+```
+## 
 ## ── Column specification ────────────────────────────────────────────────────────
 ## cols(
 ##   chapter = col_double(),
@@ -56,225 +67,97 @@ projects: []
 ##   sub_article = col_double(),
 ##   gdpr_text = col_character(),
 ##   href = col_character()
-## )</code></pre>
-</div>
-<div id="summary" class="section level2">
-<h2>Summary</h2>
-<pre class="r"><code>library(skimr)
-skim(gdpr_violations)</code></pre>
-<table>
-<caption><span id="tab:unnamed-chunk-2">Table 1: </span>Data summary</caption>
-<tbody>
-<tr class="odd">
-<td align="left">Name</td>
-<td align="left">gdpr_violations</td>
-</tr>
-<tr class="even">
-<td align="left">Number of rows</td>
-<td align="left">250</td>
-</tr>
-<tr class="odd">
-<td align="left">Number of columns</td>
-<td align="left">11</td>
-</tr>
-<tr class="even">
-<td align="left">_______________________</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Column type frequency:</td>
-<td align="left"></td>
-</tr>
-<tr class="even">
-<td align="left">character</td>
-<td align="left">9</td>
-</tr>
-<tr class="odd">
-<td align="left">numeric</td>
-<td align="left">2</td>
-</tr>
-<tr class="even">
-<td align="left">________________________</td>
-<td align="left"></td>
-</tr>
-<tr class="odd">
-<td align="left">Group variables</td>
-<td align="left">None</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Variable type: character</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">skim_variable</th>
-<th align="right">n_missing</th>
-<th align="right">complete_rate</th>
-<th align="right">min</th>
-<th align="right">max</th>
-<th align="right">empty</th>
-<th align="right">n_unique</th>
-<th align="right">whitespace</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">picture</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">67</td>
-<td align="right">80</td>
-<td align="right">0</td>
-<td align="right">25</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">name</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">5</td>
-<td align="right">14</td>
-<td align="right">0</td>
-<td align="right">25</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">authority</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">14</td>
-<td align="right">86</td>
-<td align="right">0</td>
-<td align="right">40</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">date</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">10</td>
-<td align="right">10</td>
-<td align="right">0</td>
-<td align="right">140</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">controller</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">2</td>
-<td align="right">93</td>
-<td align="right">0</td>
-<td align="right">187</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">article_violated</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">7</td>
-<td align="right">87</td>
-<td align="right">0</td>
-<td align="right">86</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">type</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">7</td>
-<td align="right">143</td>
-<td align="right">0</td>
-<td align="right">22</td>
-<td align="right">0</td>
-</tr>
-<tr class="even">
-<td align="left">source</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">29</td>
-<td align="right">209</td>
-<td align="right">0</td>
-<td align="right">218</td>
-<td align="right">0</td>
-</tr>
-<tr class="odd">
-<td align="left">summary</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">13</td>
-<td align="right">1550</td>
-<td align="right">0</td>
-<td align="right">238</td>
-<td align="right">0</td>
-</tr>
-</tbody>
-</table>
-<p><strong>Variable type: numeric</strong></p>
-<table>
-<thead>
-<tr class="header">
-<th align="left">skim_variable</th>
-<th align="right">n_missing</th>
-<th align="right">complete_rate</th>
-<th align="right">mean</th>
-<th align="right">sd</th>
-<th align="right">p0</th>
-<th align="right">p25</th>
-<th align="right">p50</th>
-<th align="right">p75</th>
-<th align="right">p100</th>
-<th align="left">hist</th>
-</tr>
-</thead>
-<tbody>
-<tr class="odd">
-<td align="left">id</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">125.5</td>
-<td align="right">72.31</td>
-<td align="right">1</td>
-<td align="right">63.25</td>
-<td align="right">125.5</td>
-<td align="right">187.75</td>
-<td align="right">2.5e+02</td>
-<td align="left">▇▇▇▇▇</td>
-</tr>
-<tr class="even">
-<td align="left">price</td>
-<td align="right">0</td>
-<td align="right">1</td>
-<td align="right">613214.0</td>
-<td align="right">3980371.95</td>
-<td align="right">0</td>
-<td align="right">2500.00</td>
-<td align="right">10500.0</td>
-<td align="right">60000.00</td>
-<td align="right">5.0e+07</td>
-<td align="left">▇▁▁▁▁</td>
-</tr>
-</tbody>
-</table>
-</div>
-<div id="violations" class="section level2">
-<h2>Violations</h2>
-<pre class="r"><code>library(tidyverse); library(janitor)</code></pre>
-<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
-<pre><code>## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
+## )
+```
+
+## Summary
+
+
+
+```r
+library(skimr)
+skim(gdpr_violations)
+```
+
+
+Table: Table 1: Data summary
+
+|                         |                |
+|:------------------------|:---------------|
+|Name                     |gdpr_violations |
+|Number of rows           |250             |
+|Number of columns        |11              |
+|_______________________  |                |
+|Column type frequency:   |                |
+|character                |9               |
+|numeric                  |2               |
+|________________________ |                |
+|Group variables          |None            |
+
+
+**Variable type: character**
+
+|skim_variable    | n_missing| complete_rate| min|  max| empty| n_unique| whitespace|
+|:----------------|---------:|-------------:|---:|----:|-----:|--------:|----------:|
+|picture          |         0|             1|  67|   80|     0|       25|          0|
+|name             |         0|             1|   5|   14|     0|       25|          0|
+|authority        |         0|             1|  14|   86|     0|       40|          0|
+|date             |         0|             1|  10|   10|     0|      140|          0|
+|controller       |         0|             1|   2|   93|     0|      187|          0|
+|article_violated |         0|             1|   7|   87|     0|       86|          0|
+|type             |         0|             1|   7|  143|     0|       22|          0|
+|source           |         0|             1|  29|  209|     0|      218|          0|
+|summary          |         0|             1|  13| 1550|     0|      238|          0|
+
+
+**Variable type: numeric**
+
+|skim_variable | n_missing| complete_rate|     mean|         sd| p0|     p25|     p50|      p75|    p100|hist  |
+|:-------------|---------:|-------------:|--------:|----------:|--:|-------:|-------:|--------:|-------:|:-----|
+|id            |         0|             1|    125.5|      72.31|  1|   63.25|   125.5|   187.75| 2.5e+02|▇▇▇▇▇ |
+|price         |         0|             1| 613214.0| 3980371.95|  0| 2500.00| 10500.0| 60000.00| 5.0e+07|▇▁▁▁▁ |
+
+## Violations
+
+
+```r
+library(tidyverse); library(janitor)
+```
+
+```
+## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──
+```
+
+```
+## ✓ ggplot2 3.3.3     ✓ purrr   0.3.4
 ## ✓ tibble  3.0.6     ✓ dplyr   1.0.4
 ## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
-## ✓ readr   1.4.0     ✓ forcats 0.5.1</code></pre>
-<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## ✓ readr   1.4.0     ✓ forcats 0.5.1
+```
+
+```
+## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
 ## x dplyr::filter() masks stats::filter()
-## x dplyr::lag()    masks stats::lag()</code></pre>
-<pre><code>## 
-## Attaching package: &#39;janitor&#39;</code></pre>
-<pre><code>## The following objects are masked from &#39;package:stats&#39;:
+## x dplyr::lag()    masks stats::lag()
+```
+
+```
 ## 
-##     chisq.test, fisher.test</code></pre>
-<pre class="r"><code>gdpr_violations %&gt;% tabyl(article_violated)</code></pre>
-<pre><code>##                                                                         article_violated
+## Attaching package: 'janitor'
+```
+
+```
+## The following objects are masked from 'package:stats':
+## 
+##     chisq.test, fisher.test
+```
+
+```r
+gdpr_violations %>% tabyl(article_violated)
+```
+
+```
+##                                                                         article_violated
 ##                                     Art 6 (1) GDPR|Art 58 (2) e) GDPR|Art 83 (5) a) GDPR
 ##                                                        Art. 12 (3) GDPR|Art. 15 (1) GDPR
 ##                                                            Art. 12 (4) GDPR|Art. 15 GDPR
@@ -447,44 +330,80 @@ skim(gdpr_violations)</code></pre>
 ##   1   0.004
 ##   1   0.004
 ##   1   0.004
-##   2   0.008</code></pre>
-</div>
-<div id="revenue" class="section level1">
-<h1>Revenue?</h1>
-<pre class="r"><code>GDPT &lt;- gdpr_violations %&gt;% group_by(name) %&gt;% summarise(Collected = sum(price), Violations = n())
-GDPT %&gt;% select(name, Collected) %&gt;% ggplot(., aes(x=fct_reorder(name, Collected), y=Collected/1e7, fill=name)) + geom_col() + scale_fill_viridis_d() + coord_flip() + labs(x=&quot;Country&quot;, y=&quot;Total Fines Collected (in Millions)&quot;) + guides(fill=FALSE)</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
-</div>
-<div id="a-map" class="section level1">
-<h1>A Map</h1>
-<pre class="r"><code>library(rnaturalearth)
-Europe &lt;- ne_countries(scale = &#39;medium&#39;, type = &#39;map_units&#39;, returnclass = &#39;sf&#39;, continent=&quot;Europe&quot;)
-library(sf)</code></pre>
-<pre><code>## Linking to GEOS 3.8.1, GDAL 3.1.4, PROJ 6.3.1</code></pre>
-<pre class="r"><code>Europe &lt;- sf::st_crop(Europe, xmin = -20, xmax = 45, ymin = 30, ymax = 73)</code></pre>
-<pre><code>## although coordinates are longitude/latitude, st_intersection assumes that they are planar</code></pre>
-<pre><code>## Warning: attribute variables are assumed to be spatially constant throughout all
-## geometries</code></pre>
-<pre class="r"><code>ggplot(Europe) + geom_sf()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
-<div id="merge-data" class="section level2">
-<h2>Merge Data</h2>
-<p>Plot some Europe Maps.</p>
-</div>
-<div id="total-collections" class="section level2">
-<h2>Total Collections</h2>
-<pre class="r"><code>Map.Me &lt;- left_join(Europe, GDPT, by = c(&quot;sovereignt&quot; = &quot;name&quot;))
-ggplot(Map.Me) + aes(fill=Collected) + geom_sf() + scale_fill_viridis_c()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
-</div>
-<div id="count-of-violations" class="section level2">
-<h2>Count of Violations</h2>
-<pre class="r"><code>ggplot(Map.Me) + aes(fill=Violations) + geom_sf() + scale_fill_viridis_c()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-</div>
-<div id="cost-per-violation" class="section level2">
-<h2>Cost per violation</h2>
-<pre class="r"><code>Map.Me %&gt;% mutate(Avg.Fine = Collected / Violations) %&gt;% ggplot(.) + aes(fill=Avg.Fine) + geom_sf() + labs(title=&quot;Average Fine per Violation&quot;) + scale_fill_viridis_c()</code></pre>
-<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-</div>
-</div>
+##   2   0.008
+```
+
+# Revenue?
+
+
+```r
+GDPT <- gdpr_violations %>% group_by(name) %>% summarise(Collected = sum(price), Violations = n())
+GDPT %>% select(name, Collected) %>% ggplot(., aes(x=fct_reorder(name, Collected), y=Collected/1e7, fill=name)) + geom_col() + scale_fill_viridis_d() + coord_flip() + labs(x="Country", y="Total Fines Collected (in Millions)") + guides(fill=FALSE)
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" />
+
+# A Map
+
+
+```r
+library(rnaturalearth)
+Europe <- ne_countries(scale = 'medium', type = 'map_units', returnclass = 'sf', continent="Europe")
+library(sf)
+```
+
+```
+## Linking to GEOS 3.8.1, GDAL 3.1.4, PROJ 6.3.1
+```
+
+```r
+Europe <- sf::st_crop(Europe, xmin = -20, xmax = 45, ymin = 30, ymax = 73)
+```
+
+```
+## although coordinates are longitude/latitude, st_intersection assumes that they are planar
+```
+
+```
+## Warning: attribute variables are assumed to be spatially constant throughout all
+## geometries
+```
+
+```r
+ggplot(Europe) + geom_sf()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" />
+
+## Merge Data
+
+Plot some Europe Maps.
+
+## Total Collections
+
+
+```r
+Map.Me <- left_join(Europe, GDPT, by = c("sovereignt" = "name"))
+ggplot(Map.Me) + aes(fill=Collected) + geom_sf() + scale_fill_viridis_c()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="672" />
+
+## Count of Violations
+
+
+```r
+ggplot(Map.Me) + aes(fill=Violations) + geom_sf() + scale_fill_viridis_c()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" />
+
+## Cost per violation
+
+
+```r
+Map.Me %>% mutate(Avg.Fine = Collected / Violations) %>% ggplot(.) + aes(fill=Avg.Fine) + geom_sf() + labs(title="Average Fine per Violation") + scale_fill_viridis_c()
+```
+
+<img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.png" width="672" />
+
