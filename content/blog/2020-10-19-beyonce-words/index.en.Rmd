@@ -1,0 +1,95 @@
+---
+title: "TT: Beyoncé and Taylor Swift Lyrics"
+authors: ["RWW"]
+date: '2020-10-19'
+slug: beyonce-words
+categories:
+  - tidyTuesday
+  - dataviz
+tags:
+  - tidyTuesday
+subtitle: ''
+summary: ''
+lastmod: '2020-10-19T02:11:17-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(tidytext)
+library(here)
+```
+
+## tidyTuesday: Beyoncé and Taylor Swift Lyrics
+
+<img src="https://camo.githubusercontent.com/9fd20607eb6961861f803167a3d1f17a3724d360af97051e556eeaeb516ab14e/68747470733a2f2f616b6e732d696d616765732e656f6e6c696e652e636f6d2f656f6c5f696d616765732f456e746972655f536974652f323031393732312f72735f31303234783735392d3139303832313132353131322d313032342e7461796c6f722d73776966742d6265796f6e63652d323030392d6d74762d766d61732e63742e3038323131392e6a70673f6669743d61726f756e64253743313032343a6175746f266f75747075742d7175616c6974793d39302663726f703d313032343a6175746f3b63656e7465722c746f70" alt="tidytuesday header photo of beyonce and taylor swift" width="200"/>
+
+`tidyTuesday` for the final week of September 2020 is based on the music of  Beyoncé and Taylor Swift.  To be honest, I do not know either artist well so I will pick Beyoncé and look at her lyrics.  The raw data are organized as a rather typical text file though there is some underlying tidyness to the rows and songs as embedded data to work with.  I will not work much with it but it is there to exploit.  First, I load the data.
+
+```{r}
+beyonce_lyrics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-29/beyonce_lyrics.csv')
+taylor_swift_lyrics <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-29/taylor_swift_lyrics.csv')
+sales <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-29/sales.csv')
+charts <- readr::read_csv('https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-09-29/charts.csv')
+str(beyonce_lyrics)
+```
+
+## Beyonce's Favorite Lyric Words
+
+What words does Beyoncé use the most?  I will deploy `tidytext` tools to unnest the word tokens, get rid of stop words, and create a barplot from the table of frequencies.
+
+```{r}
+beyonce_lyrics %>% 
+  unnest_tokens(word, line) %>%   # Parse the lyric lines to tidy: one word per row.
+  anti_join(., stop_words) %>%    # Remove the stop words
+  group_by(word) %>%              # Group them by word
+  summarise(Count = n()) %>%      # How common is the word?
+  top_n(25) %>%                   # Keep the top 25
+  ggplot() + 
+  aes(x=fct_reorder(word, Count), y=Count) + 
+  geom_col() + 
+  coord_flip() + 
+  labs(x="Word", title="Beyoncé's Top Words in Lyrics")
+```
+
+## Beyoncé's Cloud
+
+```{r BC1}
+library(wordcloud2)
+beyonce_lyrics %>% 
+  unnest_tokens(word, line) %>%   # Parse the lyric lines to tidy: one word per row.
+  anti_join(., stop_words) %>%    # Remove the stop words
+  group_by(word) %>%              # Group them by word
+  summarise(Count = n()) %>%      # How common is the word?
+  wordcloud2::wordcloud2(size = 0.7, shuffle = TRUE) -> WC111
+# htmlwidgets::saveWidget(widgetframe::frameWidget(WC111), file='widgets/wcbey.html')
+# MyWC
+# widgetframe::frameWidget(WC111)
+WC111
+```
+
+I will finish with the sentence rendition of the graphic.
+
+```{r BC2}
+library(wordcloud2)
+MyDat <- beyonce_lyrics %>% 
+  unnest_tokens(word, line) %>%   # Parse the lyric lines to tidy: one word per row.
+  anti_join(., stop_words) %>%    # Remove the stop words
+  group_by(word) %>%              # Group them by word
+  summarise(freq = n()) %>%      # How common is the word?
+  arrange(desc(freq))
+MyWC <- wordcloud2::letterCloud(MyDat, word="Most Popular \n Words in \n Beyonce \n Lyrics", wordSize = 1.75, backgroundColor="lightblue", color='random-dark', size=0.8)
+# htmlwidgets::saveWidget(widgetframe::frameWidget(MyWC), file='widgets/beyonce.html')
+# MyWC
+# widgetframe::frameWidget(MyWC)
+```
+
+Something about this does not seem to work now as I redesign the website.  It did at one time.
+

@@ -1,0 +1,140 @@
+---
+title: Mapping COVID-19 in Oregon
+author: Robert W. Walker
+date: '2020-03-21'
+slug: covid-19-in-oregon
+categories:
+  - R
+  - tidyverse
+tags:
+  - Maps
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-03-21T16:50:16-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="/rmarkdown-libs/htmlwidgets/htmlwidgets.js"></script>
+<script src="/rmarkdown-libs/pymjs/pym.v1.js"></script>
+<script src="/rmarkdown-libs/widgetframe-binding/widgetframe.js"></script>
+
+
+<div id="oregon-covid-data" class="section level2">
+<h2>Oregon COVID data</h2>
+<p>The Oregon data are available from OHA <a href="https://govstatus.egov.com/OR-OHA-COVID-19">here</a>. I cut and pasted the first two days because it was easy with <code>datapasta</code>. As it goes on, it was easier to write a script that I <a href="https://rww.science/R/COVID/">detail elsewhere</a> that I can self-update.</p>
+</div>
+<div id="urbnmapr" class="section level2">
+<h2><code>urbnmapr</code></h2>
+<p>The Urban Institute has an excellent state and county mapping package. I want to make use of the county-level data and plot the starter map.</p>
+<pre><code>devtools::install_github(&quot;UrbanInstitute/urbnmapr&quot;)</code></pre>
+<pre class="r"><code>Counties.SF &lt;- get_urbn_map(&quot;counties&quot;, sf=TRUE)
+ggplot(Counties.SF) + geom_sf()</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<p>I want to use it to map Oregon counties. First, I need to identify Oregon counties and the case for <code>Oregon</code>. Filter those and plot them.</p>
+<pre class="r"><code>library(janitor)
+Counties.SF %&gt;% tabyl(state_name) %&gt;% head()</code></pre>
+<pre><code>##  state_namegeometry  n     percent
+##             Alabama 67 0.021323997
+##              Alaska 29 0.009229790
+##             Arizona 15 0.004774029
+##            Arkansas 75 0.023870146
+##          California 58 0.018459580
+##            Colorado 64 0.020369192</code></pre>
+<pre class="r"><code>Oregon.SF &lt;- Counties.SF %&gt;% filter(state_name==&quot;Oregon&quot;)
+ggplot(Oregon.SF) + geom_sf()</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<p>Interesting that Oregon never actually looks the way it should because of projections. Mercator is more common.</p>
+<pre class="r"><code>library(ggthemes); library(ggrepel)
+Oregon.SF &lt;- Oregon.SF %&gt;% mutate(County = str_remove(county_name, &quot; County&quot;))
+ggplot(Oregon.SF, aes(geometry=geometry)) + geom_sf() + coord_sf(crs=3785, datum=NA) + geom_sf_text(aes(label = County)) + theme(text = element_text(size = 1))</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<pre class="r"><code>ggplot(Oregon.SF, aes(geometry=geometry)) + 
+  geom_sf() + 
+  coord_sf(crs=3785, datum=NA) + 
+#  geom_sf_text(aes(label = County)) + 
+#  theme(text = element_text(size = 1))
+  ggrepel::geom_text_repel(aes(label = County), stat = &quot;sf_coordinates&quot;,
+    min.segment.length = 0,
+    colour = &quot;red&quot;,
+    segment.colour = &quot;red&quot;,
+    size = 3,
+    box.padding = unit(0.05, &quot;lines&quot;)) + theme_map()</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>To join the data together, we are going to need an appropriate merge column. The named counties in Oregon from the map are:</p>
+<pre class="r"><code>Oregon.SF %&gt;% tabyl(county_name) %&gt;% head()</code></pre>
+<pre><code>##  county_namegeometry n    percent
+##         Baker County 1 0.02777778
+##        Benton County 1 0.02777778
+##     Clackamas County 1 0.02777778
+##       Clatsop County 1 0.02777778
+##      Columbia County 1 0.02777778
+##          Coos County 1 0.02777778</code></pre>
+<p>The data have named counties also, they look like this:</p>
+<pre class="r"><code>Oregon.COVID %&gt;% tabyl(County) %&gt;% head()</code></pre>
+<pre><code>##     County n    percent
+##      Baker 1 0.02777778
+##     Benton 1 0.02777778
+##  Clackamas 1 0.02777778
+##    Clatsop 1 0.02777778
+##   Columbia 1 0.02777778
+##       Coos 1 0.02777778</code></pre>
+<p>To match them up, I will add to the existing names in <code>Oregon.COVID</code> with the missing verbiage. After reconciling the names, combine the data and the map using a <code>left_join</code> with the map as the base and attaching matching data so that all the counties that we wish to map are available even if some are missing data in the merge.</p>
+</div>
+<div id="covid-19-in-oregon" class="section level1">
+<h1>COVID-19 in Oregon</h1>
+<pre class="r"><code>Oregon.COVID &lt;- Oregon.COVID %&gt;% mutate(county_name = paste(County,&quot;County&quot;, sep=&quot; &quot;))
+Map.Me &lt;- left_join(Oregon.SF,Oregon.COVID, by=&quot;county_name&quot;)
+ggplot(Map.Me, aes(geometry=geometry, fill=Number.of.cases)) + geom_sf() + coord_sf(crs=3785, datum=NA) + scale_fill_viridis_c() + theme_minimal() + labs(title=&quot;COVID-19 in Oregon&quot;)</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<p>Or even better</p>
+<pre class="r"><code>library(ggrepel)
+ggplot(Map.Me, aes(geometry=geometry, fill=Number.of.cases, label=County.x)) + 
+  geom_sf() +
+  coord_sf(crs=3785, datum=NA) + 
+  geom_label_repel(stat = &quot;sf_coordinates&quot;,
+    min.segment.length = 0,
+    colour = &quot;white&quot;,
+    segment.colour = &quot;white&quot;,
+    size = 3,
+    box.padding = unit(0.05, &quot;lines&quot;))  + scale_fill_continuous_tableau(&quot;Red&quot;) + theme_minimal() + labs(title=&quot;COVID-19 in Oregon&quot;, x=&quot;&quot;, y=&quot;&quot;, caption=&quot;Made with R, ggplot2, and ggrepel by @PieRatio \n data: https://govstatus.egov.com/OR-OHA-COVID-19&quot;)</code></pre>
+<p><img src="/post/2020-03-21-covid-19-in-oregon/index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<div id="a-leaflet" class="section level3">
+<h3>A Leaflet</h3>
+<pre class="r"><code>library(widgetframe); library(leaflet); library(here); library(htmlwidgets); library(htmltools)
+m &lt;- leaflet() %&gt;% addProviderTiles(&quot;OpenStreetMap.Mapnik&quot;) %&gt;% setView(lat=43.8041, lng=-120.5542, zoom=6) %&gt;% addTiles()
+frameWidget(m)</code></pre>
+<p>So I have a base leaflet to work with. There are issues with showing multiple framewidgets so I will skip displaying the basic map of Oregon.</p>
+</div>
+<div id="final-leaflet" class="section level2">
+<h2>Final Leaflet</h2>
+<p>Merge the relevant data together after using TIGER to grab the spatial definitions.</p>
+<pre class="r"><code>library(widgetframe); library(leaflet); library(here); library(htmlwidgets)
+library(tigris); library(rgdal); library(htmltools); library(viridis)
+counties.t &lt;- counties(state = &quot;41&quot;, resolution = &quot;500k&quot;, class=&quot;sf&quot;)
+OC22 &lt;- Oregon.COVID %&gt;% filter(date==&quot;2020-03-22&quot;)
+Map.L &lt;- merge(counties.t, OC22, by.x=&quot;NAME&quot;, by.y= &quot;County&quot;)</code></pre>
+<p>Build the final plot. The first line creates a palette. Then I build the leaflet</p>
+<pre class="r"><code>mypal &lt;- colorNumeric(palette = &quot;viridis&quot;, domain = Map.L$Number.of.cases, na.color = &quot;grey&quot;)
+m2 &lt;- leaflet() %&gt;% 
+  addProviderTiles(&quot;OpenStreetMap.Mapnik&quot;) %&gt;% 
+  setView(lat=43.8041, lng=-120.5542, zoom=6) %&gt;% 
+  addTiles()  %&gt;% 
+  addPolygons(data=Map.L, 
+              color = &quot;white&quot;, 
+              fillOpacity = 0.3, 
+              fillColor = mypal(Map.L$Number.of.cases), 
+              weight=0.5, 
+              highlightOptions = highlightOptions(color = &quot;white&quot;, weight = 2, bringToFront = TRUE), 
+              label = lapply(Map.L$PTT, htmltools::HTML)) %&gt;%
+  addLegend(&quot;bottomleft&quot;, pal = mypal, values = Map.L$Number.of.cases, title = &quot;Coronavirus Cases in Oregon&quot;, opacity = 0.3)
+frameWidget(m2)</code></pre>
+<div id="htmlwidget-1" style="width:100%;height:480px;" class="widgetframe html-widget"></div>
+<script type="application/json" data-for="htmlwidget-1">{"x":{"url":"/post/2020-03-21-covid-19-in-oregon/index_files/figure-html//widgets/widget_unnamed-chunk-12.html","options":{"xdomain":"*","allowfullscreen":false,"lazyload":false}},"evals":[],"jsHooks":[]}</script>
+</div>
+</div>

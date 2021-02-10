@@ -1,0 +1,1163 @@
+---
+title: "Datasaurus Dozen"
+authors: ["RWW"]
+date: '2020-10-19'
+slug: datasaurus-dozen
+categories:
+  - tidyTuesday
+  - dataviz
+tags:
+  - tidyTuesday
+  - tidyverse
+subtitle: ''
+summary: ''
+lastmod: '2020-10-19T12:46:43-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="{{< blogdown/postref >}}index.en_files/header-attrs/header-attrs.js"></script>
+<script src="{{< blogdown/postref >}}index.en_files/kePrint/kePrint.js"></script>
+<link href="{{< blogdown/postref >}}index.en_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="the-datasaurus-dozen" class="section level1">
+<h1>The <code>datasaurus dozen</code></h1>
+<p>The datasaurus dozen is a fantastic teaching resource for examining the importance of data visualization. Let’s have a look. The basic idea is that all thirteen (datasaurus plus 12) contain nearly identical means and standard deviations though they do vary if the five number summaries are deployed. The scatterplots that are derived from data with similar x-y summaries is a useful reminder that data science is about patterns, not just statistics.</p>
+<pre class="r"><code>datasaurus &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-10-13/datasaurus.csv&#39;)</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   dataset = col_character(),
+##   x = col_double(),
+##   y = col_double()
+## )</code></pre>
+<p>Two libraries to make our work easy.</p>
+<pre><code>library(tidyverse)
+library(skimr)</code></pre>
+<p>First, the summary statistics. Summary statistics are great but they are no substitute for basic data familiarity. Notice, we have nearly identical means and standard deviations though the five number summaries do vary.</p>
+<pre class="r"><code>datasaurus %&gt;% group_by(dataset) %&gt;% skim_to_wide(x,y) %&gt;% knitr::kable(&quot;html&quot;, 2) %&gt;% scroll_box(width=&quot;100%&quot;, height=&quot;500px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:500px; overflow-x: scroll; width:100%; ">
+<table>
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+skim_type
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+skim_variable
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+dataset
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+n_missing
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+complete_rate
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p0
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p25
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p50
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p75
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p100
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+away
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+15.56
+</td>
+<td style="text-align:right;">
+39.72
+</td>
+<td style="text-align:right;">
+53.34
+</td>
+<td style="text-align:right;">
+69.15
+</td>
+<td style="text-align:right;">
+91.64
+</td>
+<td style="text-align:left;">
+▁▇▃▇▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+bullseye
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+19.29
+</td>
+<td style="text-align:right;">
+41.63
+</td>
+<td style="text-align:right;">
+53.84
+</td>
+<td style="text-align:right;">
+64.80
+</td>
+<td style="text-align:right;">
+91.74
+</td>
+<td style="text-align:left;">
+▂▆▇▅▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+circle
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.76
+</td>
+<td style="text-align:right;">
+21.86
+</td>
+<td style="text-align:right;">
+43.38
+</td>
+<td style="text-align:right;">
+54.02
+</td>
+<td style="text-align:right;">
+64.97
+</td>
+<td style="text-align:right;">
+85.66
+</td>
+<td style="text-align:left;">
+▅▃▇▅▃
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+dino
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.26
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+22.31
+</td>
+<td style="text-align:right;">
+44.10
+</td>
+<td style="text-align:right;">
+53.33
+</td>
+<td style="text-align:right;">
+64.74
+</td>
+<td style="text-align:right;">
+98.21
+</td>
+<td style="text-align:left;">
+▅▇▇▅▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+dots
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.26
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+25.44
+</td>
+<td style="text-align:right;">
+50.36
+</td>
+<td style="text-align:right;">
+50.98
+</td>
+<td style="text-align:right;">
+75.20
+</td>
+<td style="text-align:right;">
+77.95
+</td>
+<td style="text-align:left;">
+▂▁▇▁▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+h_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.26
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+22.00
+</td>
+<td style="text-align:right;">
+42.29
+</td>
+<td style="text-align:right;">
+53.07
+</td>
+<td style="text-align:right;">
+66.77
+</td>
+<td style="text-align:right;">
+98.29
+</td>
+<td style="text-align:left;">
+▅▇▇▅▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+high_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+17.89
+</td>
+<td style="text-align:right;">
+41.54
+</td>
+<td style="text-align:right;">
+54.17
+</td>
+<td style="text-align:right;">
+63.95
+</td>
+<td style="text-align:right;">
+96.08
+</td>
+<td style="text-align:left;">
+▂▅▇▃▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+slant_down
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+18.11
+</td>
+<td style="text-align:right;">
+42.89
+</td>
+<td style="text-align:right;">
+53.14
+</td>
+<td style="text-align:right;">
+64.47
+</td>
+<td style="text-align:right;">
+95.59
+</td>
+<td style="text-align:left;">
+▂▅▇▃▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+slant_up
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+20.21
+</td>
+<td style="text-align:right;">
+42.81
+</td>
+<td style="text-align:right;">
+54.26
+</td>
+<td style="text-align:right;">
+64.49
+</td>
+<td style="text-align:right;">
+95.26
+</td>
+<td style="text-align:left;">
+▃▆▇▃▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+star
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+27.02
+</td>
+<td style="text-align:right;">
+41.03
+</td>
+<td style="text-align:right;">
+56.53
+</td>
+<td style="text-align:right;">
+68.71
+</td>
+<td style="text-align:right;">
+86.44
+</td>
+<td style="text-align:left;">
+▅▇▇▃▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+v_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+30.45
+</td>
+<td style="text-align:right;">
+49.96
+</td>
+<td style="text-align:right;">
+50.36
+</td>
+<td style="text-align:right;">
+69.50
+</td>
+<td style="text-align:right;">
+89.50
+</td>
+<td style="text-align:left;">
+▃▇▁▅▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+wide_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.27
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+27.44
+</td>
+<td style="text-align:right;">
+35.52
+</td>
+<td style="text-align:right;">
+64.55
+</td>
+<td style="text-align:right;">
+67.45
+</td>
+<td style="text-align:right;">
+77.92
+</td>
+<td style="text-align:left;">
+▇▂▁▇▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+x
+</td>
+<td style="text-align:left;">
+x_shape
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+54.26
+</td>
+<td style="text-align:right;">
+16.77
+</td>
+<td style="text-align:right;">
+31.11
+</td>
+<td style="text-align:right;">
+40.09
+</td>
+<td style="text-align:right;">
+47.14
+</td>
+<td style="text-align:right;">
+71.86
+</td>
+<td style="text-align:right;">
+85.45
+</td>
+<td style="text-align:left;">
+▇▆▁▃▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+away
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+0.02
+</td>
+<td style="text-align:right;">
+24.63
+</td>
+<td style="text-align:right;">
+47.54
+</td>
+<td style="text-align:right;">
+71.80
+</td>
+<td style="text-align:right;">
+97.48
+</td>
+<td style="text-align:left;">
+▅▆▃▇▃
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+bullseye
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+9.69
+</td>
+<td style="text-align:right;">
+26.24
+</td>
+<td style="text-align:right;">
+47.38
+</td>
+<td style="text-align:right;">
+72.53
+</td>
+<td style="text-align:right;">
+85.88
+</td>
+<td style="text-align:left;">
+▇▆▃▅▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+circle
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.93
+</td>
+<td style="text-align:right;">
+16.33
+</td>
+<td style="text-align:right;">
+18.35
+</td>
+<td style="text-align:right;">
+51.03
+</td>
+<td style="text-align:right;">
+77.78
+</td>
+<td style="text-align:right;">
+85.58
+</td>
+<td style="text-align:left;">
+▇▁▁▂▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+dino
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+2.95
+</td>
+<td style="text-align:right;">
+25.29
+</td>
+<td style="text-align:right;">
+46.03
+</td>
+<td style="text-align:right;">
+68.53
+</td>
+<td style="text-align:right;">
+99.49
+</td>
+<td style="text-align:left;">
+▇▇▇▅▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+dots
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.93
+</td>
+<td style="text-align:right;">
+15.77
+</td>
+<td style="text-align:right;">
+17.11
+</td>
+<td style="text-align:right;">
+51.30
+</td>
+<td style="text-align:right;">
+82.88
+</td>
+<td style="text-align:right;">
+94.25
+</td>
+<td style="text-align:left;">
+▇▁▇▁▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+h_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+10.46
+</td>
+<td style="text-align:right;">
+30.48
+</td>
+<td style="text-align:right;">
+50.47
+</td>
+<td style="text-align:right;">
+70.35
+</td>
+<td style="text-align:right;">
+90.46
+</td>
+<td style="text-align:left;">
+▆▇▇▅▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+high_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+14.91
+</td>
+<td style="text-align:right;">
+22.92
+</td>
+<td style="text-align:right;">
+32.50
+</td>
+<td style="text-align:right;">
+75.94
+</td>
+<td style="text-align:right;">
+87.15
+</td>
+<td style="text-align:left;">
+▇▁▁▃▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+slant_down
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+0.30
+</td>
+<td style="text-align:right;">
+27.84
+</td>
+<td style="text-align:right;">
+46.40
+</td>
+<td style="text-align:right;">
+68.44
+</td>
+<td style="text-align:right;">
+99.64
+</td>
+<td style="text-align:left;">
+▆▇▇▅▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+slant_up
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+5.65
+</td>
+<td style="text-align:right;">
+24.76
+</td>
+<td style="text-align:right;">
+45.29
+</td>
+<td style="text-align:right;">
+70.86
+</td>
+<td style="text-align:right;">
+99.58
+</td>
+<td style="text-align:left;">
+▇▇▇▅▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+star
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.93
+</td>
+<td style="text-align:right;">
+14.37
+</td>
+<td style="text-align:right;">
+20.37
+</td>
+<td style="text-align:right;">
+50.11
+</td>
+<td style="text-align:right;">
+63.55
+</td>
+<td style="text-align:right;">
+92.21
+</td>
+<td style="text-align:left;">
+▇▂▂▅▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+v_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+2.73
+</td>
+<td style="text-align:right;">
+22.75
+</td>
+<td style="text-align:right;">
+47.11
+</td>
+<td style="text-align:right;">
+65.85
+</td>
+<td style="text-align:right;">
+99.69
+</td>
+<td style="text-align:left;">
+▇▆▇▃▅
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+wide_lines
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.83
+</td>
+<td style="text-align:right;">
+26.94
+</td>
+<td style="text-align:right;">
+0.22
+</td>
+<td style="text-align:right;">
+24.35
+</td>
+<td style="text-align:right;">
+46.28
+</td>
+<td style="text-align:right;">
+67.57
+</td>
+<td style="text-align:right;">
+99.28
+</td>
+<td style="text-align:left;">
+▇▇▇▅▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+y
+</td>
+<td style="text-align:left;">
+x_shape
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1
+</td>
+<td style="text-align:right;">
+47.84
+</td>
+<td style="text-align:right;">
+26.93
+</td>
+<td style="text-align:right;">
+4.58
+</td>
+<td style="text-align:right;">
+23.47
+</td>
+<td style="text-align:right;">
+39.88
+</td>
+<td style="text-align:right;">
+73.61
+</td>
+<td style="text-align:right;">
+97.84
+</td>
+<td style="text-align:left;">
+▇▇▂▆▅
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>Notice that all of the datasets are nearly identical. But have a look at them.</p>
+<pre class="r"><code>DP &lt;- datasaurus %&gt;% ggplot() + aes(x=x, y=y, color=dataset, group=dataset) + geom_point() + guides(color=FALSE) + facet_wrap(vars(dataset))
+DP</code></pre>
+<p><img src="{{< blogdown/postref >}}index.en_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>

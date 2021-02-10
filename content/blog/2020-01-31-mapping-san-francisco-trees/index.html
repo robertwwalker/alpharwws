@@ -1,0 +1,292 @@
+---
+title: Mapping San Francisco Trees
+author: Robert W. Walker
+date: '2020-01-31'
+slug: mapping-san-francisco-trees
+categories:
+  - tidyTuesday
+  - tidyverse
+tags:
+  - Maps
+  - tidyTuesday
+  - tidyverse
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-01-31T04:25:21-08:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="trees-in-san-francisco" class="section level1">
+<h1>Trees in San Francisco</h1>
+<p>This week’s data cover trees in San Francisco.</p>
+<pre class="r"><code>sf_trees &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2020/2020-01-28/sf_trees.csv&#39;)
+library(tidyverse); library(ggmap); library(skimr)
+skim(sf_trees)</code></pre>
+<table>
+<caption><span id="tab:unnamed-chunk-1">Table 1: </span>Data summary</caption>
+<tbody>
+<tr class="odd">
+<td align="left">Name</td>
+<td align="left">sf_trees</td>
+</tr>
+<tr class="even">
+<td align="left">Number of rows</td>
+<td align="left">192987</td>
+</tr>
+<tr class="odd">
+<td align="left">Number of columns</td>
+<td align="left">12</td>
+</tr>
+<tr class="even">
+<td align="left">_______________________</td>
+<td align="left"></td>
+</tr>
+<tr class="odd">
+<td align="left">Column type frequency:</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">character</td>
+<td align="left">6</td>
+</tr>
+<tr class="odd">
+<td align="left">Date</td>
+<td align="left">1</td>
+</tr>
+<tr class="even">
+<td align="left">numeric</td>
+<td align="left">5</td>
+</tr>
+<tr class="odd">
+<td align="left">________________________</td>
+<td align="left"></td>
+</tr>
+<tr class="even">
+<td align="left">Group variables</td>
+<td align="left">None</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: character</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">empty</th>
+<th align="right">n_unique</th>
+<th align="right">whitespace</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">legal_status</td>
+<td align="right">54</td>
+<td align="right">1.00</td>
+<td align="right">7</td>
+<td align="right">28</td>
+<td align="right">0</td>
+<td align="right">9</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">species</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">2</td>
+<td align="right">81</td>
+<td align="right">0</td>
+<td align="right">571</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">address</td>
+<td align="right">1487</td>
+<td align="right">0.99</td>
+<td align="right">1</td>
+<td align="right">40</td>
+<td align="right">0</td>
+<td align="right">85909</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">site_info</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">1</td>
+<td align="right">33</td>
+<td align="right">0</td>
+<td align="right">31</td>
+<td align="right">0</td>
+</tr>
+<tr class="odd">
+<td align="left">caretaker</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">3</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">22</td>
+<td align="right">0</td>
+</tr>
+<tr class="even">
+<td align="left">plot_size</td>
+<td align="right">50013</td>
+<td align="right">0.74</td>
+<td align="right">1</td>
+<td align="right">23</td>
+<td align="right">0</td>
+<td align="right">524</td>
+<td align="right">0</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: Date</strong></p>
+<table>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="left">min</th>
+<th align="left">max</th>
+<th align="left">median</th>
+<th align="right">n_unique</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">date</td>
+<td align="right">124610</td>
+<td align="right">0.35</td>
+<td align="left">1955-09-19</td>
+<td align="left">2020-01-25</td>
+<td align="left">2001-06-12</td>
+<td align="right">7404</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Variable type: numeric</strong></p>
+<table>
+<colgroup>
+<col width="12%" />
+<col width="9%" />
+<col width="12%" />
+<col width="9%" />
+<col width="8%" />
+<col width="7%" />
+<col width="8%" />
+<col width="9%" />
+<col width="9%" />
+<col width="9%" />
+<col width="5%" />
+</colgroup>
+<thead>
+<tr class="header">
+<th align="left">skim_variable</th>
+<th align="right">n_missing</th>
+<th align="right">complete_rate</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">p0</th>
+<th align="right">p25</th>
+<th align="right">p50</th>
+<th align="right">p75</th>
+<th align="right">p100</th>
+<th align="left">hist</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">tree_id</td>
+<td align="right">0</td>
+<td align="right">1.00</td>
+<td align="right">126529.21</td>
+<td align="right">79317.04</td>
+<td align="right">1.00</td>
+<td align="right">52601.50</td>
+<td align="right">120862.00</td>
+<td align="right">202607.50</td>
+<td align="right">261546.00</td>
+<td align="left">▇▆▆▆▇</td>
+</tr>
+<tr class="even">
+<td align="left">site_order</td>
+<td align="right">1634</td>
+<td align="right">0.99</td>
+<td align="right">4.58</td>
+<td align="right">12.52</td>
+<td align="right">-50.00</td>
+<td align="right">1.00</td>
+<td align="right">2.00</td>
+<td align="right">4.00</td>
+<td align="right">501.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">dbh</td>
+<td align="right">41819</td>
+<td align="right">0.78</td>
+<td align="right">9.95</td>
+<td align="right">29.36</td>
+<td align="right">0.00</td>
+<td align="right">3.00</td>
+<td align="right">7.00</td>
+<td align="right">12.00</td>
+<td align="right">9999.00</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="even">
+<td align="left">latitude</td>
+<td align="right">2832</td>
+<td align="right">0.99</td>
+<td align="right">37.77</td>
+<td align="right">0.25</td>
+<td align="right">37.51</td>
+<td align="right">37.74</td>
+<td align="right">37.76</td>
+<td align="right">37.78</td>
+<td align="right">47.27</td>
+<td align="left">▇▁▁▁▁</td>
+</tr>
+<tr class="odd">
+<td align="left">longitude</td>
+<td align="right">2832</td>
+<td align="right">0.99</td>
+<td align="right">-122.45</td>
+<td align="right">0.42</td>
+<td align="right">-138.28</td>
+<td align="right">-122.45</td>
+<td align="right">-122.43</td>
+<td align="right">-122.41</td>
+<td align="right">-122.37</td>
+<td align="left">▁▁▁▁▇</td>
+</tr>
+</tbody>
+</table>
+<pre class="r"><code>( My.Map &lt;- ggmap(get_map(&quot;San Francisco, CA&quot;, zoom=12)) + geom_point(data=sf_trees, aes(x=longitude, y=latitude, color=legal_status, text=address), size=0.1, alpha=0.1) + theme_minimal() )</code></pre>
+<pre><code>## Source : https://maps.googleapis.com/maps/api/staticmap?center=San%20Francisco,%20CA&amp;zoom=12&amp;size=640x640&amp;scale=2&amp;maptype=terrain&amp;language=en-EN&amp;key=xxx-jAsYoenYRmMfzTFwXpVYE76s</code></pre>
+<pre><code>## Source : https://maps.googleapis.com/maps/api/geocode/json?address=San+Francisco,+CA&amp;key=xxx-jAsYoenYRmMfzTFwXpVYE76s</code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: text</code></pre>
+<pre><code>## Warning: Removed 2963 rows containing missing values (geom_point).</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>library(plotly)
+library(widgetframe)
+MMGGP &lt;- ggplotly(My.Map)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(MMGGP), here:::here(&#39;static/img/widgets/mmmgp1map.html&#39;))</code></pre>
+<iframe width="800" height="800" src="https://rww.science/img/widgets/mmmgp1map.html" frameborder="0" allowfullscreen>
+</iframe>
+</div>

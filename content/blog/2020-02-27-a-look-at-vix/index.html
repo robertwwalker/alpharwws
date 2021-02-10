@@ -1,0 +1,87 @@
+---
+title: "A Look at VIX :2020-10-19"
+author: Robert W. Walker
+date: '2020-02-27'
+slug: a-look-at-vix
+categories:
+  - R
+  - tidyquant
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: "2020-10-19 14:00:35"
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+<script src="index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="get-some-vix-data" class="section level1">
+<h1>Get Some VIX data</h1>
+<p><strong>NB: I originally wrote this on February 27, 2020 so there is commentary surrounding that date. It was done on the quick for curiosity.</strong> I will update it by recompiling it with new data and will update the commentary noting when it took place.</p>
+<p>Chicago Board Of Exchange (CBOE) makes data available regularly. To judge the currency of the data, I have tailed it below after converting the dates to a valid date format.</p>
+<pre class="r"><code>library(tidyverse)
+VIX &lt;- read.csv(url(&quot;http://www.cboe.com/publish/scheduledtask/mktdata/datahouse/vixcurrent.csv&quot;), skip = 1)
+VIX$Dates &lt;- as.Date(VIX$Date,
+  format = &quot;%m/%d/%Y&quot;)
+tail(VIX)</code></pre>
+<pre><code>##            Date VIX.Open VIX.High VIX.Low VIX.Close      Dates
+## 4223 10/09/2020    26.20    26.22   24.03     25.00 2020-10-09
+## 4224 10/12/2020    25.65    25.65   24.14     25.07 2020-10-12
+## 4225 10/13/2020    25.67    26.93   25.16     26.07 2020-10-13
+## 4226 10/14/2020    25.72    27.23   25.53     26.40 2020-10-14
+## 4227 10/15/2020    27.10    29.06   26.82     26.97 2020-10-15
+## 4228 10/16/2020    27.16    27.46   26.19     27.41 2020-10-16</code></pre>
+<p>The data was straightforward to get a hold of. Now let me plot it. I want to do this with a candlestick plot – a way of displaying intra-day volatility. There’s so much data that the views aren’t great.</p>
+<pre class="r"><code>library(plotly)
+# create the candlestick plot
+fig &lt;- VIX  %&gt;% plot_ly(x = ~Dates, type=&quot;candlestick&quot;,
+          open = ~VIX.Open, close = ~VIX.Close,
+          high = ~VIX.High, low = ~VIX.Low) 
+fig &lt;- fig %&gt;% layout(title = &quot;A Historical Look at VIX&quot;)
+library(widgetframe)
+# Need a frameWidget to render the underlying plotly object
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig), here:::here(&#39;static/img/widgets/vixfig.html&#39;))</code></pre>
+<iframe width="600" height="405" src="https://rww.science/img/widgets/vixfig.html" frameborder="0" allowfullscreen>
+</iframe>
+<p><em>As an overall it has been worse, but keep in mind, that big blip happened TODAY!</em> What does it look like in perspective [keeping in mind that the futures are currently just under 40] since 2012?</p>
+<pre class="r"><code>fig2 &lt;- VIX %&gt;% filter(Dates &gt; as.Date(&quot;01/01/2012&quot;, format = &quot;%m/%d/%Y&quot;)) %&gt;% plot_ly(x = ~Dates, type=&quot;candlestick&quot;,
+          open = ~VIX.Open, close = ~VIX.Close,
+          high = ~VIX.High, low = ~VIX.Low) 
+fig2 &lt;- fig2 %&gt;% layout(title = &quot;VIX Since 2012&quot;)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig2), here:::here(&#39;static/img/widgets/vixfig2.html&#39;))</code></pre>
+<iframe width="600" height="405" src="https://rww.science/img/widgets/vixfig2.html" frameborder="0" allowfullscreen>
+</iframe>
+<div id="day-to-day-changes" class="section level2">
+<h2>Day to Day Changes?</h2>
+<p>I will touch the file about daily to track the evolution.</p>
+<pre class="r"><code>library(hrbrthemes); library(viridis)
+VIX &lt;- VIX %&gt;% mutate(Percent.Change = (VIX.Close - lag(VIX.Close)) / lag(VIX.Close)) 
+p &lt;- ggplot(VIX, aes(x=Dates, y=Percent.Change, size=Percent.Change/10, color=Percent.Change)) + 
+  geom_point(alpha=0.5, shape=21, inherit.aes = TRUE) +
+  scale_size_continuous(range=c(0.05,2), guide=FALSE) +
+  geom_line() + 
+  geom_smooth(color=&quot;orange&quot;, method=&quot;loess&quot;, span=0.05, se=FALSE) + 
+  geom_vline(xintercept = as.Date(&quot;02/27/2020&quot;, format = &quot;%m/%d/%Y&quot;), color=&quot;red&quot;, alpha=0.2, linetype = &quot;dotted&quot;) + 
+  geom_vline(xintercept = as.Date(&quot;09/12/2008&quot;, format = &quot;%m/%d/%Y&quot;), color=&quot;red&quot;, alpha=0.4) +
+  geom_label(data = data.frame(x = as.Date(&quot;2008-02-12&quot;),
+    y = 0.75, label = &quot;Lehman Brothers&quot;),mapping = aes(x = x, y = y, label = label), size = 3.86605783866058, angle = 0L, lineheight = 1L, hjust = 0.5, vjust = 0.5, colour = &quot;red&quot;, family = &quot;sans&quot;, fontface = &quot;plain&quot;, label.padding = structure(0.25, class = &quot;unit&quot;, valid.unit = 3L, unit = &quot;lines&quot;), label.size = 0.25, label.r = structure(0.15, class = &quot;unit&quot;, valid.unit = 3L, unit = &quot;lines&quot;), inherit.aes = FALSE, show.legend = FALSE) + 
+  scale_color_viridis_c(guide=FALSE) +
+  scale_fill_viridis_c(guide=FALSE) +
+    theme_ipsum()
+fig3 &lt;- ggplotly(p)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig3), here:::here(&#39;static/img/widgets/vixfig3.html&#39;))</code></pre>
+<iframe width="800" height="600" src="https://rww.science/img/widgets/vixfig3.html" frameborder="0" allowfullscreen>
+</iframe>
+<p><em>NB: This commentary was in mid-March.</em> This doesn’t look good. The smooth on a small span is uncomfortably headed upward and today will shock it like no previous day in a very long while.</p>
+</div>
+</div>

@@ -1,0 +1,93 @@
+---
+title: "A Look at VIX :`r Sys.Date()`"
+author: Robert W. Walker
+date: '2020-02-27'
+slug: a-look-at-vix
+categories:
+  - R
+  - tidyquant
+tags: []
+subtitle: ''
+summary: ''
+authors: []
+lastmod: "`r Sys.time()`"
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+# Get Some VIX data
+
+**NB:  I originally wrote this on February 27, 2020 so there is commentary surrounding that date.  It was done on the quick for curiosity.**  I will update it by recompiling it with new data and will update the commentary noting when it took place.
+
+Chicago Board Of Exchange (CBOE) makes data available regularly. To judge the currency of the data, I have tailed it below after converting the dates to a valid date format.  
+
+```{r, warning=FALSE, message=FALSE}
+library(tidyverse)
+VIX <- read.csv(url("http://www.cboe.com/publish/scheduledtask/mktdata/datahouse/vixcurrent.csv"), skip = 1)
+VIX$Dates <- as.Date(VIX$Date,
+  format = "%m/%d/%Y")
+tail(VIX)
+```
+
+The data was straightforward to get a hold of.  Now let me plot it.  I want to do this with a candlestick plot -- a way of displaying intra-day volatility.  There's so much data that the views aren't great.
+
+```{r, message=FALSE, warning=FALSE}
+library(plotly)
+# create the candlestick plot
+fig <- VIX  %>% plot_ly(x = ~Dates, type="candlestick",
+          open = ~VIX.Open, close = ~VIX.Close,
+          high = ~VIX.High, low = ~VIX.Low) 
+fig <- fig %>% layout(title = "A Historical Look at VIX")
+library(widgetframe)
+# Need a frameWidget to render the underlying plotly object
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig), here:::here('static/img/widgets/vixfig.html'))
+```
+
+<iframe width="600" height="405" src="https://rww.science/img/widgets/vixfig.html" frameborder="0" allowfullscreen></iframe>
+
+*As an overall it has been worse, but keep in mind, that big blip happened TODAY!*  What does it look like in perspective [keeping in mind that the futures are currently just under 40] since 2012?
+
+```{r}
+fig2 <- VIX %>% filter(Dates > as.Date("01/01/2012", format = "%m/%d/%Y")) %>% plot_ly(x = ~Dates, type="candlestick",
+          open = ~VIX.Open, close = ~VIX.Close,
+          high = ~VIX.High, low = ~VIX.Low) 
+fig2 <- fig2 %>% layout(title = "VIX Since 2012")
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig2), here:::here('static/img/widgets/vixfig2.html'))
+```
+
+<iframe width="600" height="405" src="https://rww.science/img/widgets/vixfig2.html" frameborder="0" allowfullscreen></iframe>
+
+
+## Day to Day Changes?
+
+I will touch the file about daily to track the evolution.
+
+```{r, warning=FALSE, message=FALSE}
+library(hrbrthemes); library(viridis)
+VIX <- VIX %>% mutate(Percent.Change = (VIX.Close - lag(VIX.Close)) / lag(VIX.Close)) 
+p <- ggplot(VIX, aes(x=Dates, y=Percent.Change, size=Percent.Change/10, color=Percent.Change)) + 
+  geom_point(alpha=0.5, shape=21, inherit.aes = TRUE) +
+  scale_size_continuous(range=c(0.05,2), guide=FALSE) +
+  geom_line() + 
+  geom_smooth(color="orange", method="loess", span=0.05, se=FALSE) + 
+  geom_vline(xintercept = as.Date("02/27/2020", format = "%m/%d/%Y"), color="red", alpha=0.2, linetype = "dotted") + 
+  geom_vline(xintercept = as.Date("09/12/2008", format = "%m/%d/%Y"), color="red", alpha=0.4) +
+  geom_label(data = data.frame(x = as.Date("2008-02-12"),
+    y = 0.75, label = "Lehman Brothers"),mapping = aes(x = x, y = y, label = label), size = 3.86605783866058, angle = 0L, lineheight = 1L, hjust = 0.5, vjust = 0.5, colour = "red", family = "sans", fontface = "plain", label.padding = structure(0.25, class = "unit", valid.unit = 3L, unit = "lines"), label.size = 0.25, label.r = structure(0.15, class = "unit", valid.unit = 3L, unit = "lines"), inherit.aes = FALSE, show.legend = FALSE) + 
+  scale_color_viridis_c(guide=FALSE) +
+  scale_fill_viridis_c(guide=FALSE) +
+    theme_ipsum()
+fig3 <- ggplotly(p)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(fig3), here:::here('static/img/widgets/vixfig3.html'))
+```
+
+<iframe width="800" height="600" src="https://rww.science/img/widgets/vixfig3.html" frameborder="0" allowfullscreen></iframe>
+
+*NB: This commentary was in mid-March.*  This doesn't look good.  The smooth on a small span is uncomfortably headed upward and today will shock it like no previous day in a very long while.

@@ -1,0 +1,172 @@
+---
+title: 'COVID in the US and the World'
+authors: ["RWW"]
+date: '2020-03-25'
+slug: covid-in-the-us-and-the-world
+categories: []
+tags: []
+subtitle: ''
+summary: ''
+lastmod: '2020-03-25T23:33:58-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+# The Johns Hopkins dashboard
+
+This is what [Johns Hopkins has provided as a dashboard using ARCGIS](https://coronavirus.jhu.edu/map.html).  They have essentially layered out the data into national and subnational data and then used the arcgis dashboard to cycle through them.
+
+<iframe width="650" height="400" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" title="2019-nCoV" src="//gisanddata.maps.arcgis.com/apps/Embed/index.html?webmap=14aa9e5660cf42b5b4b546dec6ceec7c&extent=77.3846,11.535,163.5174,52.8632&zoom=true&previewImage=false&scale=true&disable_scroll=true&theme=light"></iframe>
+
+# The data
+
+There are a few different types of data available.  I am relying on the same sources that Johns Hopkins is using for the county level incident data.  I don't really like this because the data are named instances.  The New York Times data are easier to work with.
+
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse); library(sf); library(rnaturalearth); library(rnaturalearthdata); library(ggmap)
+March26JH <- read_csv(url("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/03-26-2020.csv"))
+March29JH <- read_csv(url("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_daily_reports/03-29-2020.csv"))
+```
+
+# A Leaflet
+
+Let's see what one set looks like.  I am doing this first for March 26; after, I will do March 29.
+
+```{r, warning=FALSE, message=FALSE}
+library(leaflet); library(rMaps); library(leaflet.extras)
+L2 <- leaflet(March26JH) %>% 
+  addTiles() %>% 
+#  addCircles(lng = ~Long, lat = ~Lat, weight = 1, radius = 1, popup = ~Combined_Key) %>% 
+  addHeatmap(lng=~Long_,
+             lat=~Lat,
+             radius = 9,
+             intensity = ~Confirmed)
+library(widgetframe)
+frameWidget(L2)
+``` 
+
+### March 29
+
+```{r}
+L2 <- leaflet(March29JH) %>% 
+  addTiles() %>% 
+#  addCircles(lng = ~Long, lat = ~Lat, weight = 1, radius = 1, popup = ~Combined_Key) %>% 
+  addHeatmap(lng=~Long_,
+             lat=~Lat,
+             radius = 9,
+             intensity = ~Confirmed)
+library(widgetframe)
+frameWidget(L2)
+```
+
+
+# `@jburnmurdoch` of the Financial Times
+
+Now I will work with the nominal time series of this.
+
+```{r}
+SR.TS <- readr::read_csv(url("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/who_covid_19_situation_reports/who_covid_19_sit_rep_time_series/who_covid_19_sit_rep_time_series.csv"))
+```
+Something is wrong with the `3/5/2020` column.  It has two values; one a number and another parenthetical number.  I just replace the value.
+
+```{r, eval=FALSE}
+SR.TS$`3/5/2020`[18] <- "128"
+SR.TS <- SR.TS %>% mutate(`3/5/2020` = as.numeric(`3/5/2020`))
+```
+
+# Global Coronavirus Cases
+
+Now it is time to rearrange this data.  Let's start with the global case totals.
+
+```{r}
+SR.Global <- SR.TS %>% filter(`Country/Region`=="Globally") %>% pivot_longer(cols=c(5:dim(SR.TS)[[2]])) %>% pivot_wider(., names_from = `Province/States`, values_from = value) %>% mutate(date=as.Date(name, format = "%m/%d/%Y"))
+```
+
+## The Plot
+
+```{r}
+ggplot(SR.Global) +
+ aes(x = date, y = Confirmed) +
+ geom_line(size = 1L, colour = "#c6dbef") +
+ geom_point(size = 1L, colour = "#c6dbef") +
+ labs(x = "Date", y = "Confirmed Cases", title = "Global Cases of Coronavirus") +
+ hrbrthemes::theme_ft_rc()
+```
+
+# Deaths
+
+```{r}
+ggplot(SR.Global) +
+ aes(x = date, y = Deaths) +
+ geom_line(size = 1L, colour = "#c6dbef") +
+ geom_point(size = 1L, colour = "#c6dbef") +
+ labs(x = "Date", y = "Confirmed Deaths", title = "Reported Global Deaths from COVID-19") +
+ hrbrthemes::theme_ft_rc()
+```
+
+That is legitimately odd.
+
+```{r, eval=FALSE}
+TS2 <- read_csv(url("https://raw.githubusercontent.com/CSSEGISandData/COVID-19/master/csse_covid_19_data/csse_covid_19_time_series/time_series_covid19_deaths_global.csv"))
+Tidy.Counts <- TS2 %>% pivot_longer(., cols=c(5:dim(TS2)[[2]]), names_to = "date", values_to = "Cases")
+```
+
+# The US Counties Data
+
+```{r}
+library(urbnmapr); library(ggthemes)
+USCounties <- read_csv("https://raw.githubusercontent.com/nytimes/covid-19-data/master/us-counties.csv")
+library(tigris); library(rgdal); library(htmltools); library(viridis); library(sf); library(viridis)
+counties.t <- get_urbn_map("counties", sf=TRUE) %>% mutate(fips = county_fips)
+# Map.Me <- left_join(counties.t,Oregon.COVID, by=c("NAME" = "County"))
+Map.Me <- merge(counties.t, USCounties)
+```
+
+The county level choropleth is not a very good plot.  Too much is missing and it is hard to se any variation at all.  The epidemic is currently concentrated.
+
+```{r}
+Map.Me %>% filter(date=="2020-03-28") %>% ggplot(., aes(geometry=geometry, fill=cases)) + geom_sf() + scale_fill_viridis_c() + theme_map()
+```
+
+I don't really like that so I will put it together with a bubble.  I have intentionally left out Hawaii and Alaska from this plot.
+
+```{r}
+library(rnaturalearth)
+# devtools::install_github("hafen/housingData")
+Map.Me.2 <- left_join(housingData::geoCounty, USCounties, by="fips")
+MM3 <- merge(counties.t,Map.Me.2)
+Map1 <- counties.t %>% ggplot(., aes(geometry=geometry)) + geom_sf(color="black", size=0.1, alpha=0.2, fill="white")
+Shorty <- MM3 %>% filter(date=="2020-03-28")
+world <- ne_countries(scale = "medium", returnclass = "sf")
+counties <- st_as_sf(maps::map("county", plot = FALSE, fill = TRUE))
+ggplot(data = world) + geom_sf() +
+  geom_sf(data = counties, color = "grey", alpha=0.1, size=0.1) +
+  coord_sf(xlim = c(-130, -65), ylim = c(20, 55), expand = FALSE) +
+  geom_point(data=Shorty, aes(y=lat, x=lon, color=cases, fill=cases, size=cases), alpha=0.35, shape=21, color="red", inherit.aes = FALSE) + 
+  scale_size(range = c(.1, 24)) +  
+  guides(size=FALSE) + 
+  scale_fill_continuous_tableau(palette = "Red") + 
+  labs(title="COVID-19 by County Reporting") + theme_map()
+```
+
+# A Leaflet
+
+```{r}
+library(leaflet)
+MM2 <- Map.Me.2 %>% filter(date=="2020-03-28")
+mytext <- paste("County: ", MM2$county.x, "<br/>", 
+   "State: ", MM2$state.x, "<br/>", 
+   "Cases: ", MM2$cases, "<br/>", 
+   "Deaths: ", MM2$deaths, sep="") %>%
+   lapply(htmltools::HTML)
+mypalette <- colorNumeric(palette="viridis", domain=Map.Me.2$cases, na.color="transparent")
+m <- Map.Me.2 %>% filter(date=="2020-03-28") %>% leaflet(.) %>% 
+  addTiles()  %>% 
+  addCircleMarkers(~lon, ~lat, fillColor = ~mypalette(cases), fillOpacity = 0.2, color="white", radius = ~ sqrt(cases)/2, stroke=FALSE,    label = mytext, labelOptions = labelOptions( style = list("font-weight" = "normal", padding = "3px 8px"), textsize = "13px", direction = "auto")) %>% addLegend(pal=mypalette, values=~cases, opacity=0.9, title = "Cases", position = "bottomright")
+m 
+```
+

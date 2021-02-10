@@ -1,0 +1,3967 @@
+---
+title: Fariss Human Rights Data with Animation
+authors: ["RWW"]
+date: '2019-10-10'
+slug: fariss-human-rights-data-with-animation
+categories:
+  - tidyverse
+  - animation
+tags:
+  - gganimate
+  - R
+  - tidyverse
+header:
+  caption: ''
+  image: ''
+  preview: yes
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+<script src="{{< blogdown/postref >}}index_files/kePrint/kePrint.js"></script>
+<link href="{{< blogdown/postref >}}index_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<p>Chris Fariss has some really neat data on international human rights that are really interesting to visualize for insight into the development of human rights over time. The data arise from measurement models applied to a variety of underlying indicators and they are presented in rather easy to work with forms. The basic structure is panel data. Let’s see what we have.</p>
+<div id="fariss-data" class="section level2">
+<h2>Fariss Data</h2>
+<p>Is neat and complete. What does a basic summary look like?</p>
+<pre class="r"><code>load(&quot;FarissHRData.RData&quot;)
+skimr::skim(HR.Data) %&gt;% kable() %&gt;% scroll_box(width = &quot;500px&quot;, height = &quot;400px&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 0px; overflow-y: scroll; height:400px; overflow-x: scroll; width:500px; ">
+<table>
+<thead>
+<tr>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+skim_type
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+skim_variable
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+n_missing
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+complete_rate
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+factor.ordered
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+factor.n_unique
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+factor.top_counts
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.mean
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.sd
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p0
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p25
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p50
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p75
+</th>
+<th style="text-align:right;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.p100
+</th>
+<th style="text-align:left;position: sticky; top:0; background-color: #FFFFFF;">
+numeric.hist
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+factor
+</td>
+<td style="text-align:left;">
+COW_YEAR
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+FALSE
+</td>
+<td style="text-align:right;">
+11717
+</td>
+<td style="text-align:left;">
+100: 1, 100: 1, 100: 1, 100: 1
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+X
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+5859.7179312
+</td>
+<td style="text-align:right;">
+3.382902e+03
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2930.0000000
+</td>
+<td style="text-align:right;">
+5860.0000000
+</td>
+<td style="text-align:right;">
+8789.0000000
+</td>
+<td style="text-align:right;">
+1.171800e+04
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+YEAR
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1984.7799778
+</td>
+<td style="text-align:right;">
+2.044002e+01
+</td>
+<td style="text-align:right;">
+1946.0000000
+</td>
+<td style="text-align:right;">
+1968.0000000
+</td>
+<td style="text-align:right;">
+1987.0000000
+</td>
+<td style="text-align:right;">
+2002.0000000
+</td>
+<td style="text-align:right;">
+2.017000e+03
+</td>
+<td style="text-align:left;">
+▅▆▆▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+CIRI
+</td>
+<td style="text-align:right;">
+6787
+</td>
+<td style="text-align:right;">
+0.4207562
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+390.5206897
+</td>
+<td style="text-align:right;">
+1.708487e+02
+</td>
+<td style="text-align:right;">
+101.0000000
+</td>
+<td style="text-align:right;">
+242.0000000
+</td>
+<td style="text-align:right;">
+380.0000000
+</td>
+<td style="text-align:right;">
+530.0000000
+</td>
+<td style="text-align:right;">
+6.980000e+02
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+COW
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+461.2141333
+</td>
+<td style="text-align:right;">
+2.544006e+02
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+255.0000000
+</td>
+<td style="text-align:right;">
+461.0000000
+</td>
+<td style="text-align:right;">
+663.0000000
+</td>
+<td style="text-align:right;">
+9.900000e+02
+</td>
+<td style="text-align:left;">
+▆▆▇▆▃
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+DISAP
+</td>
+<td style="text-align:right;">
+6798
+</td>
+<td style="text-align:right;">
+0.4198174
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1.6824558
+</td>
+<td style="text-align:right;">
+6.235183e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.000000e+00
+</td>
+<td style="text-align:left;">
+▁▁▂▁▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+KILL
+</td>
+<td style="text-align:right;">
+6800
+</td>
+<td style="text-align:right;">
+0.4196467
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1.3264185
+</td>
+<td style="text-align:right;">
+7.618201e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.000000e+00
+</td>
+<td style="text-align:left;">
+▃▁▅▁▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+POLPRIS
+</td>
+<td style="text-align:right;">
+6793
+</td>
+<td style="text-align:right;">
+0.4202441
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1.1271324
+</td>
+<td style="text-align:right;">
+8.444313e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+2.000000e+00
+</td>
+<td style="text-align:left;">
+▆▁▅▁▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+TORT
+</td>
+<td style="text-align:right;">
+6794
+</td>
+<td style="text-align:right;">
+0.4201587
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.7865123
+</td>
+<td style="text-align:right;">
+7.470142e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▇▁▃
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+Amnesty
+</td>
+<td style="text-align:right;">
+6140
+</td>
+<td style="text-align:right;">
+0.4759751
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+2.6967904
+</td>
+<td style="text-align:right;">
+1.117414e+00
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+5.000000e+00
+</td>
+<td style="text-align:left;">
+▃▇▇▅▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+State
+</td>
+<td style="text-align:right;">
+4802
+</td>
+<td style="text-align:right;">
+0.5901681
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+2.3888648
+</td>
+<td style="text-align:right;">
+1.158494e+00
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+5.000000e+00
+</td>
+<td style="text-align:left;">
+▇▇▇▃▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+HRW
+</td>
+<td style="text-align:right;">
+11271
+</td>
+<td style="text-align:right;">
+0.0380644
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+3.0336323
+</td>
+<td style="text-align:right;">
+1.110214e+00
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+4.0000000
+</td>
+<td style="text-align:right;">
+5.000000e+00
+</td>
+<td style="text-align:left;">
+▂▅▇▅▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+hathaway
+</td>
+<td style="text-align:right;">
+9484
+</td>
+<td style="text-align:right;">
+0.1905778
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+2.7398119
+</td>
+<td style="text-align:right;">
+1.149612e+00
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+3.0000000
+</td>
+<td style="text-align:right;">
+5.000000e+00
+</td>
+<td style="text-align:left;">
+▃▆▇▅▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+ITT
+</td>
+<td style="text-align:right;">
+10258
+</td>
+<td style="text-align:right;">
+0.1245199
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+3.5119945
+</td>
+<td style="text-align:right;">
+2.028693e+00
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+4.0000000
+</td>
+<td style="text-align:right;">
+6.0000000
+</td>
+<td style="text-align:right;">
+6.000000e+00
+</td>
+<td style="text-align:left;">
+▇▃▃▃▆
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+genocide
+</td>
+<td style="text-align:right;">
+1261
+</td>
+<td style="text-align:right;">
+0.8923786
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.0267789
+</td>
+<td style="text-align:right;">
+1.614443e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+rummel
+</td>
+<td style="text-align:right;">
+6077
+</td>
+<td style="text-align:right;">
+0.4813519
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.1969858
+</td>
+<td style="text-align:right;">
+3.977568e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▂
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+massive_repression
+</td>
+<td style="text-align:right;">
+5541
+</td>
+<td style="text-align:right;">
+0.5270974
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.0463083
+</td>
+<td style="text-align:right;">
+2.101689e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+executions
+</td>
+<td style="text-align:right;">
+7613
+</td>
+<td style="text-align:right;">
+0.3502603
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.1023392
+</td>
+<td style="text-align:right;">
+3.031308e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+negative_sanctions
+</td>
+<td style="text-align:right;">
+7613
+</td>
+<td style="text-align:right;">
+0.3502603
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.6920078
+</td>
+<td style="text-align:right;">
+4.617196e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▃▁▁▁▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+mass_killing
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.1300674
+</td>
+<td style="text-align:right;">
+3.363920e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+killing_low
+</td>
+<td style="text-align:right;">
+6176
+</td>
+<td style="text-align:right;">
+0.4729026
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+45.3382061
+</td>
+<td style="text-align:right;">
+2.306652e+03
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.714410e+05
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+killing_best
+</td>
+<td style="text-align:right;">
+11397
+</td>
+<td style="text-align:right;">
+0.0273107
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+1855.3531250
+</td>
+<td style="text-align:right;">
+2.794140e+04
+</td>
+<td style="text-align:right;">
+25.0000000
+</td>
+<td style="text-align:right;">
+42.0000000
+</td>
+<td style="text-align:right;">
+99.5000000
+</td>
+<td style="text-align:right;">
+251.2500000
+</td>
+<td style="text-align:right;">
+5.000000e+05
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+killing_high
+</td>
+<td style="text-align:right;">
+11397
+</td>
+<td style="text-align:right;">
+0.0273107
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+3043.1125000
+</td>
+<td style="text-align:right;">
+4.471485e+04
+</td>
+<td style="text-align:right;">
+25.0000000
+</td>
+<td style="text-align:right;">
+62.0000000
+</td>
+<td style="text-align:right;">
+149.0000000
+</td>
+<td style="text-align:right;">
+397.7500000
+</td>
+<td style="text-align:right;">
+8.000000e+05
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+killing_present
+</td>
+<td style="text-align:right;">
+6176
+</td>
+<td style="text-align:right;">
+0.4729026
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.0577513
+</td>
+<td style="text-align:right;">
+2.332936e-01
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+0.0000000
+</td>
+<td style="text-align:right;">
+1.000000e+00
+</td>
+<td style="text-align:left;">
+▇▁▁▁▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+id
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+5859.0000000
+</td>
+<td style="text-align:right;">
+3.382551e+03
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:right;">
+2930.0000000
+</td>
+<td style="text-align:right;">
+5859.0000000
+</td>
+<td style="text-align:right;">
+8788.0000000
+</td>
+<td style="text-align:right;">
+1.171700e+04
+</td>
+<td style="text-align:left;">
+▇▇▇▇▇
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+theta_mean
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.0533879
+</td>
+<td style="text-align:right;">
+1.521246e+00
+</td>
+<td style="text-align:right;">
+-3.7673933
+</td>
+<td style="text-align:right;">
+-0.9903354
+</td>
+<td style="text-align:right;">
+-0.0712589
+</td>
+<td style="text-align:right;">
+0.9614952
+</td>
+<td style="text-align:right;">
+5.139970e+00
+</td>
+<td style="text-align:left;">
+▂▇▇▂▁
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+numeric
+</td>
+<td style="text-align:left;">
+theta_sd
+</td>
+<td style="text-align:right;">
+0
+</td>
+<td style="text-align:right;">
+1.0000000
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+NA
+</td>
+<td style="text-align:left;">
+NA
+</td>
+<td style="text-align:right;">
+0.3624942
+</td>
+<td style="text-align:right;">
+1.851480e-01
+</td>
+<td style="text-align:right;">
+0.1834267
+</td>
+<td style="text-align:right;">
+0.2259013
+</td>
+<td style="text-align:right;">
+0.2674378
+</td>
+<td style="text-align:right;">
+0.4730958
+</td>
+<td style="text-align:right;">
+1.310565e+00
+</td>
+<td style="text-align:left;">
+▇▂▁▁▁
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<pre class="r"><code># HR.Data$year &lt;- as.Date(HR.Data$YEAR, format = &quot;%Y&quot;)</code></pre>
+</div>
+<div id="what-do-we-have" class="section level2">
+<h2>What do we have?</h2>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/pressure-1.png" width="672" /></p>
+</div>
+<div id="a-first-animation" class="section level2">
+<h2>A first animation</h2>
+<pre class="r"><code>library(gganimate)
+p1 &lt;- p1 + transition_reveal(YEAR) # this is kind of a hack, the year isn&#39;t right
+animate(p1, nframes = 200)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-1-1.gif" /><!-- --></p>
+</div>
+<div id="divide-it-up-by-continents" class="section level2">
+<h2>Divide it up by continents</h2>
+<pre class="r"><code>COW.Codes &lt;- distinct(COW.Codes) # Duplicates exist in the COW Code master file
+COW.Codes$Continent &lt;- cut(COW.Codes$CCode, breaks = c(0, 100, 200, 400, 600, 700, 900,1000), labels = c(&quot;N. America&quot;, &quot;S. America&quot;, &quot;Europe&quot;, &quot;Africa&quot;, &quot;Med/Mid&quot;, &quot;Asia&quot;, &quot;Oceania&quot;), right = FALSE)
+HR.Data.Named &lt;- left_join(HR.Data, COW.Codes, by = c(&quot;COW&quot; = &quot;CCode&quot;))</code></pre>
+<p>Now I have something to work with that is labeled.</p>
+<pre class="r"><code>( ggplot(HR.Data.Named) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateAbb) + geom_line(alpha = 0.3)  +  scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot; ) + theme_economist_white() + facet_wrap(vars(Continent)) -&gt; p2 )</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+<pre class="r"><code>p2</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-2.png" width="672" /></p>
+<p>Now let’s look at that as an animation.</p>
+<pre class="r"><code>p2 &lt;- p2 + transition_reveal(YEAR)
+animate(p2, nframes = 200)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.gif" /><!-- --></p>
+</div>
+<div id="north-america" class="section level2">
+<h2>North America</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 100) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateAbb) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;North America&quot;) + theme_economist_white()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<div id="an-animation-for-north-america" class="section level3">
+<h3>An Animation for North America</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 100) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;North America&quot;) + theme_economist_white() + transition_reveal(YEAR) -&gt; NA.p
+animate(NA.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.gif" /><!-- --></p>
+</div>
+</div>
+<div id="south-america" class="section level2">
+<h2>South America</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 200 &amp; COW &gt; 100) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;South America&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<div id="animation-for-south-america" class="section level3">
+<h3>Animation for South America</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 200 &amp; COW &gt;= 100) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;South America&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; SA.p
+animate(SA.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-8-1.gif" /><!-- --></p>
+</div>
+<div id="europe" class="section level3">
+<h3>Europe</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 400 &amp; COW &gt;= 200) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Europe&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+</div>
+<div id="animate-europe" class="section level3">
+<h3>Animate Europe</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 400 &amp; COW &gt;= 200) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Europe&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; EU.p
+animate(EU.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 24 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 33 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 32 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 31 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 32 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 28 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 31 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 41 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 44 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 35 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.gif" /><!-- --></p>
+</div>
+</div>
+<div id="africa" class="section level2">
+<h2>Africa</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 600 &amp; COW &gt;= 400) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Africa&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<div id="animate-africa" class="section level3">
+<h3>Animate Africa</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 600 &amp; COW &gt;= 400) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Africa&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; AF.p
+animate(EU.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 24 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 24 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 23 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 33 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 32 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 31 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 32 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 28 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 31 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 34 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 41 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 42 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 43 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 44 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 36 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 38 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 40 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 39 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 37 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-12-1.gif" /><!-- --></p>
+</div>
+</div>
+<div id="middle-east-north-africa" class="section level2">
+<h2>Middle East / North Africa</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 700 &amp; COW &gt;= 600) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Middle East and North Africa&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<div id="animate-mid-east-north-africa" class="section level3">
+<h3>Animate Mid East / North Africa</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 700 &amp; COW &gt;= 600) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Middle East and North Africa&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; MENA.p
+animate(MENA.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-14-1.gif" /><!-- --></p>
+</div>
+</div>
+<div id="asia" class="section level2">
+<h2>Asia</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 900 &amp; COW &gt;= 700) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Asia&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<div id="animate-asia" class="section level3">
+<h3>Animate Asia</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &lt; 900 &amp; COW &gt;= 700) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2015, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Asia&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; Asia.p
+animate(Asia.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 3 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 6 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 7 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 5 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 21 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 20 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 28 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 28 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 27 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 26 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 25 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 23 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 22 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 19 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 18 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 17 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 15 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 16 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 14 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 13 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 12 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 11 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 8 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 9 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 10 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-16-1.gif" /><!-- --></p>
+</div>
+</div>
+<div id="oceania" class="section level2">
+<h2>Oceania</h2>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW  &gt;= 900) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Oceania&quot;) + theme_economist()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<div id="animate-oceania" class="section level3">
+<h3>Animate Oceania</h3>
+<pre class="r"><code>HR.Data.Named %&gt;% filter(COW &gt;= 900) %&gt;% ggplot(.) + aes(x=YEAR, y=theta_mean, color=as.factor(StateAbb), label = StateNme) + geom_label_repel(x=2010, size=2, direction = &quot;y&quot;, hjust = 1, nudge_x = 20) + geom_line(alpha = 0.3) +   scale_color_viridis_d(guide=FALSE) + labs(x=&quot;Year&quot;, y=&quot;Human Rights Dynamic Factor Score&quot;, title = &quot;The Evolution of Human Rights with Normed Scores&quot;, caption = &quot;See Fariss and Schnakenberg (2014)&quot;, subtitle = &quot;Oceania&quot;) + theme_economist() + transition_reveal(YEAR) -&gt; OC.p
+animate(OC.p, nframes=200)</code></pre>
+<pre><code>## Warning: ggrepel: 1 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps
+
+## Warning: ggrepel: 4 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<pre><code>## Warning: ggrepel: 2 unlabeled data points (too many overlaps). Consider
+## increasing max.overlaps</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-18-1.gif" /><!-- --></p>
+</div>
+</div>

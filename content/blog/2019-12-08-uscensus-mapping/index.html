@@ -1,0 +1,651 @@
+---
+title: 'US Census Mapping'
+author: RWW
+date: '2019-12-09'
+slug: uscensus-mapping
+categories:
+  - R
+  - animation
+  - tidyverse
+tags:
+  - tidyTuesday
+  - R
+  - Maps
+header:
+  caption: ''
+  image: ''
+  preview: yes
+---
+
+<script src="index_files/header-attrs/header-attrs.js"></script>
+<script src="index_files/kePrint/kePrint.js"></script>
+<link href="index_files/lightable/lightable.css" rel="stylesheet" />
+
+
+<div id="searching-and-mapping-the-census" class="section level2">
+<h2>Searching and Mapping the Census</h2>
+</div>
+<div id="searching-for-the-asian-population-via-the-census" class="section level2">
+<h2>Searching for the Asian Population via the Census</h2>
+<p>To use <code>tidycensus</code>, there are limitations imposed by the available tables. There is ACS – a survey of about 3 million people – and the two main decennial census files [SF1] and [SF2]. I will search SF1 for the Asian population.</p>
+<pre class="r"><code>library(tidycensus); library(kableExtra)
+library(tidyverse); library(stringr)
+v10 &lt;- load_variables(2010, &quot;sf1&quot;, cache = TRUE)
+v10 %&gt;% filter(str_detect(concept, &quot;ASIAN&quot;)) %&gt;% filter(str_detect(label, &quot;Female&quot;)) %&gt;% kable() %&gt;% scroll_box(width = &quot;100%&quot;)</code></pre>
+<div style="border: 1px solid #ddd; padding: 5px; overflow-x: scroll; width:100%; ">
+<table>
+<thead>
+<tr>
+<th style="text-align:left;">
+name
+</th>
+<th style="text-align:left;">
+label
+</th>
+<th style="text-align:left;">
+concept
+</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align:left;">
+P012D026
+</td>
+<td style="text-align:left;">
+Total!!Female
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D027
+</td>
+<td style="text-align:left;">
+Total!!Female!!Under 5 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D028
+</td>
+<td style="text-align:left;">
+Total!!Female!!5 to 9 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D029
+</td>
+<td style="text-align:left;">
+Total!!Female!!10 to 14 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D030
+</td>
+<td style="text-align:left;">
+Total!!Female!!15 to 17 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D031
+</td>
+<td style="text-align:left;">
+Total!!Female!!18 and 19 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D032
+</td>
+<td style="text-align:left;">
+Total!!Female!!20 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D033
+</td>
+<td style="text-align:left;">
+Total!!Female!!21 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D034
+</td>
+<td style="text-align:left;">
+Total!!Female!!22 to 24 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D035
+</td>
+<td style="text-align:left;">
+Total!!Female!!25 to 29 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D036
+</td>
+<td style="text-align:left;">
+Total!!Female!!30 to 34 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D037
+</td>
+<td style="text-align:left;">
+Total!!Female!!35 to 39 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D038
+</td>
+<td style="text-align:left;">
+Total!!Female!!40 to 44 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D039
+</td>
+<td style="text-align:left;">
+Total!!Female!!45 to 49 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D040
+</td>
+<td style="text-align:left;">
+Total!!Female!!50 to 54 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D041
+</td>
+<td style="text-align:left;">
+Total!!Female!!55 to 59 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D042
+</td>
+<td style="text-align:left;">
+Total!!Female!!60 and 61 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D043
+</td>
+<td style="text-align:left;">
+Total!!Female!!62 to 64 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D044
+</td>
+<td style="text-align:left;">
+Total!!Female!!65 and 66 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D045
+</td>
+<td style="text-align:left;">
+Total!!Female!!67 to 69 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D046
+</td>
+<td style="text-align:left;">
+Total!!Female!!70 to 74 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D047
+</td>
+<td style="text-align:left;">
+Total!!Female!!75 to 79 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D048
+</td>
+<td style="text-align:left;">
+Total!!Female!!80 to 84 years
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P012D049
+</td>
+<td style="text-align:left;">
+Total!!Female!!85 years and over
+</td>
+<td style="text-align:left;">
+SEX BY AGE (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P013D003
+</td>
+<td style="text-align:left;">
+Median age!!Female
+</td>
+<td style="text-align:left;">
+MEDIAN AGE BY SEX (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P018D006
+</td>
+<td style="text-align:left;">
+Total!!Family households!!Other family!!Female householder, no husband present
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P029D006
+</td>
+<td style="text-align:left;">
+Total!!In households!!In family households!!Householder!!Female
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P029D022
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P029D023
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder!!Living alone
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P029D024
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder!!Not living alone
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P034D006
+</td>
+<td style="text-align:left;">
+Total!!In households!!In family households!!Householder!!Female
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP FOR THE POPULATION 65 YEARS AND OVER (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P034D016
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP FOR THE POPULATION 65 YEARS AND OVER (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P034D017
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder!!Living alone
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP FOR THE POPULATION 65 YEARS AND OVER (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P034D018
+</td>
+<td style="text-align:left;">
+Total!!In households!!In nonfamily households!!Female householder!!Not living alone
+</td>
+<td style="text-align:left;">
+HOUSEHOLD TYPE BY RELATIONSHIP FOR THE POPULATION 65 YEARS AND OVER (ASIAN ALONE)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D015
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D016
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With own children under 18 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D017
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With own children under 18 years!!Under 6 years only
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D018
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With own children under 18 years!!Under 6 years and 6 to 17 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D019
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With own children under 18 years!!6 to 17 years only
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P038D020
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!No own children under 18 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF OWN CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D015
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D016
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With related children under 18 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D017
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With related children under 18 years!!Under 6 years only
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D018
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With related children under 18 years!!Under 6 years and 6 to 17 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D019
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!With related children under 18 years!!6 to 17 years only
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+<tr>
+<td style="text-align:left;">
+P039D020
+</td>
+<td style="text-align:left;">
+Total!!Other family!!Female householder, no husband present!!No related children under 18 years
+</td>
+<td style="text-align:left;">
+FAMILY TYPE BY PRESENCE AND AGE OF RELATED CHILDREN (ASIAN ALONE HOUSEHOLDER)
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<p>There are still 268 to comb through but what seems useful are the bottom rows of the first set of results.</p>
+<pre class="r"><code>library(viridis)</code></pre>
+<pre><code>## Loading required package: viridisLite</code></pre>
+<pre class="r"><code>library(sf); library(ggthemes)</code></pre>
+<pre><code>## Linking to GEOS 3.8.0, GDAL 3.0.4, PROJ 6.3.1</code></pre>
+<pre class="r"><code># I need supply the names of the variables to fetch from Census: column `name` above
+vars10 &lt;- c(&quot;P012D031&quot;, &quot;P012D032&quot;, &quot;P012D033&quot;, &quot;P012D034&quot;, &quot;P012D035&quot;, &quot;P012D036&quot;)
+# Get the census data with the relevant map by county; 2010 is the most recent
+# I used the example from the help file to adapt by dropping the state to get them all and shifting Hawaii and Alaska for visibility.  They are not properly scaled.
+MapDat &lt;- get_decennial(geography = &quot;county&quot;, variables = vars10, year = 2010,
+                    geometry = TRUE, shift_geo = TRUE)</code></pre>
+<pre><code>## Getting data from the 2010 decennial Census</code></pre>
+<pre><code>## Using feature geometry obtained from the albersusa package</code></pre>
+<pre><code>## Please note: Alaska and Hawaii are being shifted and are not to scale.</code></pre>
+<pre class="r"><code># Map the data with ggplot using geom_sf()
+ggplot(MapDat, aes(fill = value, color = value)) + 
+  geom_sf() + 
+  theme_map() + 
+  scale_fill_viridis_c(guide=FALSE)+ 
+  scale_color_viridis_c(guide=FALSE) + 
+  facet_wrap(~variable)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="totals-of-the-target-population" class="section level2">
+<h2>Totals of the Target Population</h2>
+<pre><code>## `summarise()` ungrouping output (override with `.groups` argument)</code></pre>
+<p><img src="index_files/figure-html/pressure-1.png" width="672" /></p>
+<p>A plotly</p>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>PLM &lt;- ggplotly(PlotlyMe)
+library(widgetframe)</code></pre>
+<pre><code>## Loading required package: htmlwidgets</code></pre>
+<pre class="r"><code>htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(PLM), here:::here(&#39;static/img/widgets/plm11map.html&#39;))</code></pre>
+<iframe width="800" height="600" src="https://rww.science/img/widgets/plm11map.html" frameborder="0" allowfullscreen>
+</iframe>
+<p>To get rid of some of the messiness because LA is a huge outlier, perhaps it should be binned.</p>
+<pre class="r"><code>MapDatSum &lt;- MapDatSum %&gt;% mutate(Binned.Total = cut_number(Total, 5, ordered_result=TRUE))
+PlotlyMe &lt;- ggplot(MapDatSum, aes(fill = Binned.Total, text=NAME)) +
+     geom_sf(size=0.02, color=&quot;white&quot;) + theme_map() + scale_fill_viridis_d() +         labs(&quot;Asian Females Ages 18 to 34&quot;, caption = &quot;Census Table SF1&quot;)  
+PlotlyMe</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+<div id="more-than-1000-in-the-relevant-age-group" class="section level1">
+<h1>More than 1000 in the Relevant Age Group</h1>
+<pre class="r"><code>MapDatSum &lt;- MapDatSum %&gt;% mutate(Total.1000 = as.factor(Total &gt; 1000))
+PlotlyMe &lt;- ggplot(MapDatSum, aes(fill = Total.1000, text=NAME)) +
+     geom_sf(size=0.02, color=&quot;white&quot;) + theme_map() + scale_fill_viridis_d() +         labs(&quot;Asian Females Ages 18 to 34&quot;, caption = &quot;Census Table SF1&quot;, fill=&quot;More than 1000&quot;)  
+PlotlyMe</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+</div>
+<div id="more-than-5000-in-the-relevant-age-group" class="section level1">
+<h1>More than 5000 in the Relevant Age Group</h1>
+<pre class="r"><code>MapDatSum &lt;- MapDatSum %&gt;% mutate(Total.5000 = as.factor(Total &gt; 5000))
+PlotlyMe &lt;- ggplot(MapDatSum, aes(fill = Total.5000)) +
+     geom_sf(size=0.02, color=&quot;white&quot;) + theme_map() + scale_fill_viridis_d() +         labs(&quot;Asian Females Ages 18 to 34&quot;, caption = &quot;Census Table SF1&quot;, fill=&quot;More than 5000&quot;)  
+PlotlyMe</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+</div>
+<div id="more-than-10000-in-the-relevant-age-group" class="section level1">
+<h1>More than 10000 in the Relevant Age Group</h1>
+<pre class="r"><code>MapDatSum &lt;- MapDatSum %&gt;% mutate(Total.10K = as.factor(Total &gt; 10000))
+PlotlyMe &lt;- ggplot(MapDatSum, aes(fill = Total.10K)) +
+     geom_sf(size=0.02, color=&quot;white&quot;) + theme_map() + scale_fill_viridis_d() +         labs(&quot;Asian Females Ages 18 to 34&quot;, caption = &quot;Census Table SF1&quot;, fill=&quot;More than 10000&quot;)  
+PlotlyMe</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code># This takes a really long time to run.  It is not evaluated.
+library(cartogram)
+Carto &lt;- cartogram_cont(
+MapDatSum,
+&quot;Total&quot;,
+itermax = 15,
+maxSizeError = 1.0001,
+prepare = &quot;adjust&quot;,
+threshold = 0.05
+)</code></pre>
+<p>Load the cartogram already cooked.</p>
+<pre class="r"><code>load(url(&quot;https://github.com/robertwwalker/DADMStuff/raw/master/Cartogram.RData&quot;))
+ggplot(Carto, aes(fill=Total)) + geom_sf(size=0.01) + theme_map() + labs(caption=&quot;A Cartogram&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+</div>

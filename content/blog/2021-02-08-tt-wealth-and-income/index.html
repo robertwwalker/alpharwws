@@ -1,0 +1,94 @@
+---
+title: 'TT: Wealth and Income'
+author: 'Robert W. Walker'
+date: '2021-02-08'
+slug: ['2021-02-08-tt-wealth-and-income']
+categories:
+  - R
+  - tidyTuesday
+  - tidyverse
+tags:
+  - tidyTuesday
+authors: ["RWW"]
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div class="figure">
+<img src="img/TTScreen.png" alt="" />
+<p class="caption">tidyTuesday-Screenshot</p>
+</div>
+<p>tidyTuesday for the week of February 8, 2021 brings data from the US Census and the Urban Institute together to think about income, wealth, and racial inequality in these and other important economic indicators. There is a lot of data that they make available to accompany the nine charts about wealth inequality that they reported <a href="https://apps.urban.org/features/wealth-inequality-charts/">here</a>. There is considerable variation in the scope and coverage of the various datasets; I will start by loading the <em>ten</em> datasets.</p>
+<pre class="r"><code>lifetime_earn &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/lifetime_earn.csv&#39;)
+student_debt &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/student_debt.csv&#39;)
+retirement &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/retirement.csv&#39;)
+home_owner &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/home_owner.csv&#39;)
+race_wealth &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/race_wealth.csv&#39;)
+income_time &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_time.csv&#39;)
+income_limits &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_limits.csv&#39;)
+income_aggregate &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_aggregate.csv&#39;)
+income_distribution &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_distribution.csv&#39;)
+income_mean &lt;- readr::read_csv(&#39;https://raw.githubusercontent.com/rfordatascience/tidytuesday/master/data/2021/2021-02-09/income_mean.csv&#39;)</code></pre>
+<div id="lifetime-earnings" class="section level2">
+<h2>Lifetime Earnings</h2>
+<p>There is not all that much data here. Six values for the cross-tabulation of race and gender.</p>
+<pre class="r"><code>lifetime_earn %&gt;% 
+  ggplot() + 
+  aes(x=race, y=lifetime_earn/1000000, fill=race) + 
+  geom_col() + coord_flip() + 
+  facet_wrap(vars(gender)) + 
+  scale_fill_viridis_d() + theme_ipsum_tw() + 
+  labs(y=&quot;Lifetime Earnings [in millions]&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="768" /></p>
+<p>Combining the categories offers a considerably improved visual in my view.</p>
+<pre class="r"><code>lifetime_earn %&gt;% 
+  mutate(Categ = paste(race,gender,sep=&quot;:&quot;)) %&gt;% 
+  ggplot() + 
+  aes(x=Categ, y=lifetime_earn/1000000, fill=race, color=race, label=lifetime_earn/1000000, alpha=0.2) + 
+  geom_col() + geom_text(size=3, color=&quot;white&quot;, alpha=1) + 
+  coord_flip() + scale_color_ipsum() + scale_fill_ipsum() + 
+  theme_modern_rc() + 
+  labs(y=&quot;Lifetime Earnings [in millions]&quot;, x=&quot;Race:Gender&quot;) + 
+  guides(fill=FALSE, color=FALSE, alpha=FALSE)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-3-1.png" width="768" /></p>
+<pre class="r"><code>lifetime_earn %&gt;% 
+  mutate(Categ = paste(gender,race,sep=&quot;:&quot;)) %&gt;% 
+  ggplot() + 
+  aes(x=Categ, y=lifetime_earn/1000000, fill=race, color=race, label=lifetime_earn/1000000, alpha=0.2) + 
+  geom_col() + geom_text(size=3, color=&quot;white&quot;, alpha=1) + 
+  coord_flip() + scale_color_ipsum() + scale_fill_ipsum() + 
+  theme_modern_rc() + 
+  labs(y=&quot;Lifetime Earnings [in millions]&quot;, x=&quot;Race:Gender&quot;) +
+  guides(fill=FALSE, color=FALSE, alpha=FALSE)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="768" /></p>
+</div>
+<div id="student-debt" class="section level2">
+<h2>Student Debt</h2>
+<p>The student debt data is not super extensive. At three year intervals, we see growth across categories but higher levels and rates are notable by racial category. A line plot is a good place to start.</p>
+<pre class="r"><code>student_debt %&gt;% ggplot() + 
+  aes(x=year, y=loan_debt_pct, color=race) + 
+  geom_line() + geom_point(size=3) + 
+  scale_color_viridis_d() + 
+  labs(y=&quot;Share of Families with Student Loan Debt&quot;) + 
+  theme_ipsum_rc()</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="768" /></p>
+<p>A faceted bar plot.</p>
+<pre class="r"><code>student_debt %&gt;% ggplot() + 
+  aes(x=race, y=loan_debt_pct, fill=race) + 
+  geom_col() + scale_color_viridis_d() + 
+  labs(y=&quot;Share of Families with Student Loan Debt&quot;) + 
+  guides(fill=FALSE) + theme_ipsum_rc() + 
+  coord_flip() + facet_wrap(vars(year))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-6-1.png" width="768" /></p>
+</div>
+<div id="retirement" class="section level2">
+<h2>Retirement</h2>
+<p>Liquid retirement savings offer an interesting basis for comparison.</p>
+<pre class="r"><code>retirement %&gt;% ggplot() + 
+  aes(x=year, y=retirement, color=race) + 
+  geom_line() + geom_point() + 
+  scale_color_ipsum() + theme_ipsum_rc() + 
+  labs(y=&quot;Liquid Retirment Savings&quot;, color=&quot;Race&quot;)</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="768" /></p>
+</div>

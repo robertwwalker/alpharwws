@@ -1,0 +1,90 @@
+---
+title: Simple Point Maps in R
+author: RWW
+date: '2019-12-19'
+slug: simple-point-maps-in-r
+categories:
+  - Maps
+  - R
+tags:
+  - Maps
+  - tidyverse
+header:
+  caption: ''
+  image: ''
+  preview: yes
+---
+
+<script src="index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="mapping-points-in-r" class="section level1">
+<h1>Mapping Points in R</h1>
+<p>My goal is a streamlined and self-contained freeware map maker with points denoting addresses. It is a three step process that involves:</p>
+<ol style="list-style-type: decimal">
+<li>Get a map.<br />
+</li>
+<li>Geocode the addresses into latitude and longitude.<br />
+</li>
+<li>Combine the the two with a first map layer and a second layer on top that contains the points.</li>
+</ol>
+<p>From there, it is pretty easy to get fancy using ggplotly to put relevant text hovers into place.</p>
+<div id="get-a-map." class="section level2">
+<h2>Get a map.</h2>
+<p>There are a few map sources that R can access. Google has now made most features pay to access with generous free allocations. It is worth it to sign up if one plans to use it frequently. I have never actually paid for use but I do not use it much. There are nice instructions in a post by <a href="https://www.littlemissdata.com/blog/maps">littlemissdata</a>. The other issue is the type of map. The coordinates are crucial and I will need a map that is bounded on latitude and longitude. For that purpose, I think I will use <code>ggmap</code>. The <code>register_google</code> line invokes my Google API key.</p>
+<pre class="r"><code>library(tidyverse)
+library(ggmap)
+library(osmdata)
+pdx_map &lt;- get_map(getbb(&quot;portland oregon&quot;), maptype = &quot;roadmap&quot;)
+ggmap(pdx_map)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-1-1.png" width="672" /></p>
+</div>
+<div id="load-some-data-and-geocode-it-with-google" class="section level2">
+<h2>Load Some Data and Geocode it with Google</h2>
+<p>First, to get the data. I will create some data using the Portland Center but it could easily be replaced with imported data.</p>
+<pre class="r"><code>Portland.Center &lt;- data.frame(address = c(&quot;905 NW 12th Ave, Portland, OR 97209&quot;), stringsAsFactors = FALSE)
+Portland.Center &lt;- Portland.Center %&gt;% mutate_geocode(., address)
+Portland.Center</code></pre>
+<pre><code>##                               address       lon     lat
+## 1 905 NW 12th Ave, Portland, OR 97209 -122.6836 45.5295</code></pre>
+</div>
+<div id="put-them-together" class="section level2">
+<h2>Put them together</h2>
+<p>Because they are same source geocodings, this works directly.</p>
+<pre class="r"><code>ggmap(pdx_map) + geom_point(data=Portland.Center, aes(x=lon, y=lat), size=3, color=&quot;magenta&quot;)</code></pre>
+<p><img src="index_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
+</div>
+</div>
+<div id="now-to-try-without-google" class="section level1">
+<h1>Now to Try Without Google</h1>
+<p>First, an open source map.</p>
+<pre class="r"><code>pdx.map &lt;- get_stamenmap(getbb(&quot;portland oregon&quot;), 
+                         zoom = 14)
+ggmap(pdx.map)</code></pre>
+<p><img src="index_files/figure-html/PDXMap-1.png" width="672" /></p>
+</div>
+<div id="free-geocode" class="section level1">
+<h1>Free Geocode</h1>
+<pre class="r"><code>library(tmaptools)
+Geocoded.PDX &lt;- geocode_OSM(Portland.Center$address, as.data.frame = TRUE) %&gt;% select(query, lat, lon)
+p1 &lt;- ggmap(pdx.map) + geom_point(data=Geocoded.PDX, aes(x=lon, y=lat, text=query), size=3, color=&quot;magenta&quot;)
+library(plotly)
+p1a &lt;- ggplotly(p1)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(p1a), here:::here(&#39;static/img/widgets/smp1map.html&#39;))</code></pre>
+<iframe width="800" height="600" src="https://rww.science/img/widgets/smp1map.html" frameborder="0" allowfullscreen>
+</iframe>
+</div>
+<div id="leaflet" class="section level1">
+<h1>Leaflet</h1>
+<p>A very cool toy is leaflet. The markers work the way as geom_point but hovers can be replaced with popups of various forms. I really like this.</p>
+<pre class="r"><code>library(leaflet)
+Geocoded.PDX</code></pre>
+<pre><code>##                                 query      lat       lon
+## 1 905 NW 12th Ave, Portland, OR 97209 45.52957 -122.6836</code></pre>
+<pre class="r"><code>m &lt;- leaflet() %&gt;% addTiles() %&gt;% addMarkers(., data=Geocoded.PDX, lng=~lon, lat=~lat, popup = ~query)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(m), here:::here(&#39;static/img/widgets/mmmap.html&#39;))</code></pre>
+<iframe width="600" height="600" src="https://rww.science/img/widgets/mmmap.html" frameborder="0" allowfullscreen>
+</iframe>
+</div>
