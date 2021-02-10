@@ -1,0 +1,1705 @@
+---
+title: COVID-19 Maps for Oregon
+author: Robert W. Walker
+date: '2020-10-30' 
+slug: covid-maps
+categories:
+  - R
+tags:
+  - maps
+  - COVID
+subtitle: ''
+summary: ''
+authors: []
+lastmod: '2020-11-08T21:49:06-07:00'
+featured: no
+image:
+  caption: ''
+  focal_point: ''
+  preview_only: no
+projects: []
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, message=FALSE, warning = FALSE, cache = TRUE)
+library(tidyverse)
+```
+
+```{r, eval=FALSE}
+library(tigris)
+library(rgdal)
+library(htmltools)
+library(viridis) 
+library(sf)
+library(ggrepel)
+library(ggthemes)
+library(gganimate)
+library(patchwork)
+library(hrbrthemes)
+load(url(paste0("https://github.com/robertwwalker/rww-science/raw/master/content/R/COVID/data/OregonCOVID",Sys.Date(),".RData")))
+```
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE}
+library(tigris)
+library(rgdal)
+library(htmltools)
+library(viridis) 
+library(sf)
+library(ggrepel)
+library(ggthemes)
+library(gganimate)
+library(patchwork)
+library(hrbrthemes); library(here)
+load(paste0(here(),"/content/R/COVID/data/OregonCOVID",Sys.Date(),".RData"))
+load(paste0(here(),"/content/R/COVID/data/CountyMap.RData"))
+```
+
+Verifying, these data are current as of `r max(Oregon.COVID$Scraped.date)` according to the loaded dataset.
+
+# A base map
+
+To build a map to work from, I need a map library.  Load the `tigris` library then grab the map as an `sf` object; there is a `geom_sf` that makes them easy to work with.  Finally, I join the map to the data.
+
+```{r, message=FALSE, warning=FALSE, results='hide', cache=FALSE}
+Map.Me <- left_join(counties.t,Oregon.COVID, by=c("NAME" = "County"))
+```
+
+# Daily Maps
+
+The main visualization page has an animation of COVID in Oregon.  These are snapshot images that are combined; animation by frames.  The individual frames look like this.
+
+## A Mapping Function
+
+To save time later, I turned the plots into a function so that I can use to reproduce each frame.  Two inputs to the function, the dataset that is always the merged data from above and the date that I want to plot located in `date1` in a `YYYY-MM-DD` format.
+
+```{r, cache=FALSE}
+Plot.COVID <- function(date1, data) {
+data %>% filter(date==date1) %>%
+  ggplot(., aes(geometry=geometry, fill=Number.of.cases, label=NAME)) + 
+  geom_sf() +
+  geom_label_repel(stat = "sf_coordinates",
+    min.segment.length = 0,
+    colour = "white",
+    segment.colour = "white",
+    size = 3,
+    box.padding = unit(0.05, "lines"))  + scale_fill_continuous_tableau("Red") + theme_minimal() + labs(title="COVID-19 in Oregon", subtitle=date1, x="", y="", caption="Made with R, ggplot2, and ggrepel by @PieRatio \n data: https://govstatus.egov.com/OR-OHA-COVID-19")
+}
+```
+
+## The Result for 03/18/2020
+
+This is the first date for which I can find data.  The `waybackmachine` was crucial.
+
+```{r}
+Plot.COVID("2020-03-18", Map.Me)
+```
+
+
+## The Result for 03/19/2020
+
+```{r}
+Plot.COVID("2020-03-19", Map.Me)
+```
+
+
+## The Result for 03/20/2020
+
+```{r}
+Plot.COVID("2020-03-20", Map.Me)
+```
+
+
+## The Result for 03/21/2020
+
+```{r}
+Plot.COVID("2020-03-21", Map.Me)
+```
+
+## The Result for 03/22/2020
+
+```{r}
+Plot.COVID("2020-03-22", Map.Me)
+```
+
+
+## The Result for 03/23/2020
+
+```{r}
+Plot.COVID("2020-03-23", Map.Me)
+```
+
+## The Result for 03/24/2020
+
+```{r}
+Plot.COVID("2020-03-24", Map.Me)
+```
+
+## The Result for 03/25/2020
+
+```{r}
+Plot.COVID("2020-03-25", Map.Me)
+```
+
+## The Result for 03/26/2020
+
+```{r}
+Plot.COVID("2020-03-26", Map.Me)
+```
+
+## The Result for 03/27/2020
+
+```{r}
+Plot.COVID("2020-03-27", Map.Me)
+```
+
+## The Result for 03/28/2020
+
+```{r}
+Plot.COVID("2020-03-28", Map.Me)
+```
+
+
+## The Result for 03/29/2020
+
+```{r}
+Plot.COVID("2020-03-29", Map.Me)
+```
+
+## The Result for 03/30/2020
+
+```{r}
+Plot.COVID("2020-03-30", Map.Me)
+```
+
+## The Result for 03/31/2020
+
+```{r}
+Plot.COVID("2020-03-31", Map.Me)
+```
+
+## The Result for 04/01/2020
+
+```{r}
+Plot.COVID("2020-04-01", Map.Me)
+```
+
+
+## The Result for 04/02/2020
+
+```{r}
+Plot.COVID("2020-04-02", Map.Me)
+```
+
+## The Result for 04/03/2020
+
+```{r}
+Plot.COVID("2020-04-03", Map.Me)
+```
+
+## The Result for 04/04/2020
+
+```{r}
+Plot.COVID("2020-04-04", Map.Me)
+```
+
+## The Result for 04/05/2020
+
+```{r}
+Plot.COVID("2020-04-05", Map.Me)
+```
+
+## The Result for 04/06/2020
+
+```{r}
+Plot.COVID("2020-04-06", Map.Me)
+```
+
+## The Result for 04/07/2020
+
+```{r}
+Plot.COVID("2020-04-07", Map.Me)
+```
+
+## The Result for 04/08/2020
+
+```{r}
+Plot.COVID("2020-04-08", Map.Me)
+```
+
+
+## The Result for 04/09/2020
+
+```{r}
+Plot.COVID("2020-04-09", Map.Me)
+```
+
+## The Result for 04/10/2020
+
+```{r}
+Plot.COVID("2020-04-10", Map.Me)
+```
+
+## The Result for 04/11/2020
+
+```{r}
+Plot.COVID("2020-04-11", Map.Me)
+```
+
+## The Result for 04/12/2020
+
+```{r}
+Plot.COVID("2020-04-12", Map.Me)
+```
+
+
+## The Result for 04/13/2020
+
+```{r}
+Plot.COVID("2020-04-13", Map.Me)
+```
+
+
+
+## The Result for 04/14/2020
+
+```{r}
+Plot.COVID("2020-04-14", Map.Me)
+```
+
+
+
+## The Result for 04/15/2020
+
+```{r}
+Plot.COVID("2020-04-15", Map.Me)
+```
+
+
+## The Result for 04/16/2020
+
+```{r}
+Plot.COVID("2020-04-16", Map.Me)
+```
+
+## The Result for 04/17/2020
+
+```{r}
+Plot.COVID("2020-04-17", Map.Me)
+```
+
+## The Result for 04/18/2020
+
+```{r}
+Plot.COVID("2020-04-18", Map.Me)
+```
+
+## The Result for 04/19/2020
+
+```{r}
+Plot.COVID("2020-04-19", Map.Me)
+```
+
+## The Result for 04/20/2020
+
+```{r}
+Plot.COVID("2020-04-20", Map.Me)
+```
+
+## The Result for 04/21/2020
+
+```{r}
+Plot.COVID("2020-04-21", Map.Me)
+```
+
+## The Result for 04/22/2020
+
+```{r}
+Plot.COVID("2020-04-22", Map.Me)
+```
+
+## The Result for 04/23/2020
+
+```{r}
+Plot.COVID("2020-04-23", Map.Me)
+```
+
+## The Result for 04/24/2020
+
+```{r}
+Plot.COVID("2020-04-24", Map.Me)
+```
+
+## The Result for 04/25/2020
+
+```{r}
+Plot.COVID("2020-04-25", Map.Me)
+```
+
+## The Result for 04/26/2020
+
+```{r}
+Plot.COVID("2020-04-26", Map.Me)
+```
+
+## The Result for 04/27/2020
+
+```{r}
+Plot.COVID("2020-04-27", Map.Me)
+```
+
+## The Result for 04/28/2020
+
+```{r}
+Plot.COVID("2020-04-28", Map.Me)
+```
+
+## The Result for 04/29/2020
+
+```{r}
+Plot.COVID("2020-04-29", Map.Me)
+```
+
+## The Result for 04/30/2020
+
+```{r}
+Plot.COVID("2020-04-30", Map.Me)
+```
+
+## The Result for 05/01/2020
+
+```{r}
+Plot.COVID("2020-05-01", Map.Me)
+```
+
+## The Result for 05/02/2020
+
+```{r}
+Plot.COVID("2020-05-02", Map.Me)
+```
+
+## The Result for 05/03/2020
+
+```{r}
+Plot.COVID("2020-05-03", Map.Me)
+```
+
+## The Result for 05/04/2020
+
+```{r}
+Plot.COVID("2020-05-04", Map.Me)
+```
+
+
+## The Result for 05/05/2020
+
+```{r}
+Plot.COVID("2020-05-05", Map.Me)
+```
+
+## The Result for 05/06/2020
+
+```{r}
+Plot.COVID("2020-05-06", Map.Me)
+```
+
+
+## The Result for 05/07/2020
+
+```{r}
+Plot.COVID("2020-05-07", Map.Me)
+```
+
+## The Result for 05/08/2020
+
+```{r}
+Plot.COVID("2020-05-08", Map.Me)
+```
+
+## The Result for 05/09/2020
+
+```{r}
+Plot.COVID("2020-05-09", Map.Me)
+```
+
+
+## The Result for 05/10/2020
+
+```{r}
+Plot.COVID("2020-05-10", Map.Me)
+```
+
+## The Result for 05/11/2020
+
+```{r}
+Plot.COVID("2020-05-11", Map.Me)
+```
+
+## The Result for 05/12/2020
+
+```{r}
+Plot.COVID("2020-05-12", Map.Me)
+```
+
+## The Result for 05/13/2020
+
+```{r}
+Plot.COVID("2020-05-13", Map.Me)
+```
+
+## The Result for 05/14/2020
+
+```{r}
+Plot.COVID("2020-05-14", Map.Me)
+```
+
+## The Result for 05/15/2020
+
+```{r}
+Plot.COVID("2020-05-15", Map.Me)
+```
+
+## The Result for 05/16/2020
+
+```{r}
+Plot.COVID("2020-05-16", Map.Me)
+```
+
+## The Result for 05/17/2020
+
+```{r}
+Plot.COVID("2020-05-17", Map.Me)
+```
+
+
+## The Result for 05/18/2020
+
+```{r}
+Plot.COVID("2020-05-18", Map.Me)
+```
+
+## The Result for 05/19/2020
+
+```{r}
+Plot.COVID("2020-05-19", Map.Me)
+```
+
+## The Result for 05/20/2020
+
+```{r}
+Plot.COVID("2020-05-20", Map.Me)
+```
+
+## The Result for 05/21/2020
+
+```{r}
+Plot.COVID("2020-05-21", Map.Me)
+```
+
+## The Result for 05/22/2020
+
+```{r}
+Plot.COVID("2020-05-22", Map.Me)
+```
+
+## The Result for 05/23/2020
+
+```{r}
+Plot.COVID("2020-05-23", Map.Me)
+```
+
+
+## The Result for 05/24/2020
+
+```{r}
+Plot.COVID("2020-05-24", Map.Me)
+```
+
+## The Result for 05/25/2020
+
+```{r}
+Plot.COVID("2020-05-25", Map.Me)
+```
+
+## The Result for 05/26/2020
+
+```{r}
+Plot.COVID("2020-05-26", Map.Me)
+```
+
+## The Result for 05/27/2020
+
+```{r}
+Plot.COVID("2020-05-27", Map.Me)
+```
+
+## The Result for 05/28/2020
+
+```{r}
+Plot.COVID("2020-05-28", Map.Me)
+```
+
+
+## The Result for 05/29/2020
+
+```{r}
+Plot.COVID("2020-05-29", Map.Me)
+```
+
+## The Result for 05/30/2020
+
+```{r}
+Plot.COVID("2020-05-30", Map.Me)
+```
+
+## The Result for 05/31/2020
+
+```{r}
+Plot.COVID("2020-05-31", Map.Me)
+```
+
+## The Result for 06/01/2020
+
+```{r}
+Plot.COVID("2020-06-01", Map.Me)
+```
+
+## The Result for 06/02/2020
+
+```{r}
+Plot.COVID("2020-06-02", Map.Me)
+```
+
+## The Result for 06/03/2020
+
+```{r}
+Plot.COVID("2020-06-03", Map.Me)
+```
+
+## The Result for 06/04/2020
+
+```{r}
+Plot.COVID("2020-06-04", Map.Me)
+```
+
+## The Result for 06/05/2020
+
+```{r}
+Plot.COVID("2020-06-05", Map.Me)
+```
+
+## The Result for 06/06/2020
+
+```{r}
+Plot.COVID("2020-06-06", Map.Me)
+```
+
+## The Result for 06/07/2020
+
+```{r}
+Plot.COVID("2020-06-07", Map.Me)
+```
+
+## The Result for 06/08/2020
+
+```{r}
+Plot.COVID("2020-06-08", Map.Me)
+```
+
+## The Result for 06/09/2020
+
+```{r}
+Plot.COVID("2020-06-09", Map.Me)
+```
+
+## The Result for 06/10/2020
+
+```{r}
+Plot.COVID("2020-06-10", Map.Me)
+```
+
+
+## The Result for 06/11/2020
+
+```{r}
+Plot.COVID("2020-06-11", Map.Me)
+```
+
+## The Result for 06/12/2020
+
+```{r}
+Plot.COVID("2020-06-12", Map.Me)
+```
+
+## The Result for 06/13/2020
+
+```{r}
+Plot.COVID("2020-06-13", Map.Me)
+```
+
+## The Result for 06/14/2020
+
+```{r}
+Plot.COVID("2020-06-14", Map.Me)
+```
+
+## The Result for 06/15/2020
+
+```{r}
+Plot.COVID("2020-06-15", Map.Me)
+```
+
+## The Result for 06/16/2020
+
+```{r}
+Plot.COVID("2020-06-16", Map.Me)
+```
+
+## The Result for 06/18/2020
+
+```{r}
+Plot.COVID("2020-06-18", Map.Me)
+```
+
+## The Result for 06/19/2020
+
+```{r}
+Plot.COVID("2020-06-19", Map.Me)
+```
+
+## The Result for 06/20/2020
+
+```{r}
+Plot.COVID("2020-06-20", Map.Me)
+```
+
+## The Result for 06/21/2020
+
+```{r}
+Plot.COVID("2020-06-21", Map.Me)
+```
+
+## The Result for 06/22/2020
+
+```{r}
+Plot.COVID("2020-06-22", Map.Me)
+```
+
+## The Result for 06/23/2020
+
+```{r}
+Plot.COVID("2020-06-23", Map.Me)
+```
+
+## The Result for 06/24/2020
+
+```{r}
+Plot.COVID("2020-06-24", Map.Me)
+```
+
+## The Result for 06/25/2020
+
+```{r}
+Plot.COVID("2020-06-25", Map.Me)
+```
+
+
+## The Result for 06/26/2020
+
+```{r}
+Plot.COVID("2020-06-26", Map.Me)
+```
+
+## The Result for 06/27/2020
+
+```{r}
+Plot.COVID("2020-06-27", Map.Me)
+```
+
+## The Result for 06/28/2020
+
+```{r}
+Plot.COVID("2020-06-28", Map.Me)
+```
+
+## The Result for 06/29/2020
+
+```{r}
+Plot.COVID("2020-06-29", Map.Me)
+```
+
+## The Result for 06/30/2020
+
+```{r}
+Plot.COVID("2020-06-30", Map.Me)
+```
+
+## The Result for 07/01/2020
+
+```{r}
+Plot.COVID("2020-07-01", Map.Me)
+```
+
+## The Result for 07/02/2020
+
+```{r}
+Plot.COVID("2020-07-02", Map.Me)
+```
+
+## The Result for 07/03/2020
+
+```{r}
+Plot.COVID("2020-07-03", Map.Me)
+```
+
+## The Result for 07/04/2020
+
+```{r}
+Plot.COVID("2020-07-04", Map.Me)
+```
+
+## The Result for 07/05/2020
+
+```{r}
+Plot.COVID("2020-07-05", Map.Me)
+```
+
+## The Result for 07/06/2020
+
+```{r}
+Plot.COVID("2020-07-06", Map.Me)
+```
+
+## The Result for 07/07/2020
+
+```{r}
+Plot.COVID("2020-07-07", Map.Me)
+```
+
+## The Result for 07/08/2020
+
+```{r}
+Plot.COVID("2020-07-08", Map.Me)
+```
+
+## The Result for 07/09/2020
+
+```{r}
+Plot.COVID("2020-07-09", Map.Me)
+```
+
+
+## The Result for 07/10/2020
+
+```{r}
+Plot.COVID("2020-07-10", Map.Me)
+```
+
+## The Result for 07/11/2020
+
+```{r}
+Plot.COVID("2020-07-11", Map.Me)
+```
+
+## The Result for 07/12/2020
+
+```{r}
+Plot.COVID("2020-07-12", Map.Me)
+```
+
+## The Result for 07/13/2020
+
+```{r}
+Plot.COVID("2020-07-13", Map.Me)
+```
+
+## The Result for 07/14/2020
+
+```{r}
+Plot.COVID("2020-07-14", Map.Me)
+```
+
+## The Result for 07/15/2020
+
+```{r}
+Plot.COVID("2020-07-15", Map.Me)
+```
+
+## The Result for 07/16/2020
+
+```{r}
+Plot.COVID("2020-07-16", Map.Me)
+```
+
+## The Result for 07/17/2020
+
+```{r}
+Plot.COVID("2020-07-17", Map.Me)
+```
+
+## The Result for 07/18/2020
+
+```{r}
+Plot.COVID("2020-07-18", Map.Me)
+```
+
+## The Result for 07/19/2020
+
+```{r}
+Plot.COVID("2020-07-19", Map.Me)
+```
+
+## The Result for 07/20/2020
+
+```{r}
+Plot.COVID("2020-07-20", Map.Me)
+```
+
+## The Result for 07/21/2020
+
+```{r}
+Plot.COVID("2020-07-21", Map.Me)
+```
+
+## The Result for 07/22/2020
+
+```{r}
+Plot.COVID("2020-07-22", Map.Me)
+```
+
+## The Result for 07/23/2020
+
+```{r}
+Plot.COVID("2020-07-23", Map.Me)
+```
+
+## The Result for 07/24/2020
+
+```{r}
+Plot.COVID("2020-07-24", Map.Me)
+```
+
+## The Result for 07/25/2020
+
+```{r}
+Plot.COVID("2020-07-25", Map.Me)
+```
+
+## The Result for 07/26/2020
+
+```{r}
+Plot.COVID("2020-07-26", Map.Me)
+```
+
+
+## The Result for 07/27/2020
+
+```{r}
+Plot.COVID("2020-07-27", Map.Me)
+```
+
+## The Result for 07/28/2020
+
+```{r}
+Plot.COVID("2020-07-28", Map.Me)
+```
+
+## The Result for 07/29/2020
+
+```{r}
+Plot.COVID("2020-07-29", Map.Me)
+```
+
+## The Result for 07/30/2020
+
+```{r}
+Plot.COVID("2020-07-30", Map.Me)
+```
+
+## The Result for 07/31/2020
+
+```{r}
+Plot.COVID("2020-07-31", Map.Me)
+```
+
+## The Result for 08/01/2020
+
+```{r}
+Plot.COVID("2020-08-01", Map.Me)
+```
+
+## The Result for 08/02/2020
+
+```{r}
+Plot.COVID("2020-08-02", Map.Me)
+```
+
+## The Result for 08/03/2020
+
+```{r}
+Plot.COVID("2020-08-03", Map.Me)
+```
+
+## The Result for 08/04/2020
+
+```{r}
+Plot.COVID("2020-08-04", Map.Me)
+```
+
+## The Result for 08/05/2020
+
+```{r}
+Plot.COVID("2020-08-05", Map.Me)
+```
+
+
+## The Result for 08/06/2020
+
+```{r}
+Plot.COVID("2020-08-06", Map.Me)
+```
+
+## The Result for 08/07/2020
+
+```{r}
+Plot.COVID("2020-08-07", Map.Me)
+```
+
+## The Result for 08/08/2020
+
+```{r}
+Plot.COVID("2020-08-08", Map.Me)
+```
+
+## The Result for 08/09/2020
+
+```{r}
+Plot.COVID("2020-08-09", Map.Me)
+```
+
+## The Result for 08/10/2020
+
+```{r}
+Plot.COVID("2020-08-10", Map.Me)
+```
+
+## The Result for 08/11/2020
+
+```{r}
+Plot.COVID("2020-08-11", Map.Me)
+```
+
+## The Result for 08/12/2020
+
+```{r}
+Plot.COVID("2020-08-12", Map.Me)
+```
+
+
+## The Result for 08/13/2020
+
+```{r}
+Plot.COVID("2020-08-13", Map.Me)
+```
+
+
+## The Result for 08/14/2020
+
+```{r}
+Plot.COVID("2020-08-14", Map.Me)
+```
+
+## The Result for 08/15/2020
+
+```{r}
+Plot.COVID("2020-08-15", Map.Me)
+```
+
+## The Result for 08/16/2020
+
+```{r}
+Plot.COVID("2020-08-16", Map.Me)
+```
+
+## The Result for 08/17/2020
+
+```{r}
+Plot.COVID("2020-08-17", Map.Me)
+```
+
+
+## The Result for 08/18/2020
+
+```{r}
+Plot.COVID("2020-08-18", Map.Me)
+```
+
+
+## The Result for 08/19/2020
+
+```{r}
+Plot.COVID("2020-08-19", Map.Me)
+```
+
+
+## The Result for 08/20/2020
+
+```{r}
+Plot.COVID("2020-08-20", Map.Me)
+```
+
+
+## The Result for 08/21/2020
+
+```{r}
+Plot.COVID("2020-08-21", Map.Me)
+```
+
+## The Result for 08/22/2020
+
+```{r}
+Plot.COVID("2020-08-22", Map.Me)
+```
+
+## The Result for 08/23/2020
+
+```{r}
+Plot.COVID("2020-08-23", Map.Me)
+```
+
+## The Result for 08/24/2020
+
+```{r}
+Plot.COVID("2020-08-24", Map.Me)
+```
+
+## The Result for 08/25/2020
+
+```{r}
+Plot.COVID("2020-08-25", Map.Me)
+```
+
+## The Result for 08/26/2020
+
+```{r}
+Plot.COVID("2020-08-26", Map.Me)
+```
+
+## The Result for 08/27/2020
+
+```{r}
+Plot.COVID("2020-08-27", Map.Me)
+```
+
+## The Result for 08/28/2020
+
+```{r}
+Plot.COVID("2020-08-28", Map.Me)
+```
+
+## The Result for 08/29/2020
+
+```{r}
+Plot.COVID("2020-08-29", Map.Me)
+```
+
+## The Result for 08/30/2020
+
+```{r}
+Plot.COVID("2020-08-30", Map.Me)
+```
+
+## The Result for 08/31/2020
+
+```{r}
+Plot.COVID("2020-08-31", Map.Me)
+```
+
+## The Result for 09/01/2020
+
+```{r}
+Plot.COVID("2020-09-01", Map.Me)
+```
+
+## The Result for 09/02/2020
+
+```{r}
+Plot.COVID("2020-09-02", Map.Me)
+```
+
+
+## The Result for 09/03/2020
+
+```{r}
+Plot.COVID("2020-09-03", Map.Me)
+```
+
+## The Result for 09/04/2020
+
+```{r}
+Plot.COVID("2020-09-04", Map.Me)
+```
+
+## The Result for 09/05/2020
+
+```{r}
+Plot.COVID("2020-09-05", Map.Me)
+```
+
+
+## The Result for 09/06/2020
+
+```{r}
+Plot.COVID("2020-09-06", Map.Me)
+```
+
+
+## The Result for 09/07/2020
+
+```{r}
+Plot.COVID("2020-09-07", Map.Me)
+```
+
+## The Result for 09/08/2020
+
+```{r}
+Plot.COVID("2020-09-08", Map.Me)
+```
+
+## The Result for 09/09/2020
+
+```{r}
+Plot.COVID("2020-09-09", Map.Me)
+```
+
+## The Result for 09/10/2020
+
+```{r}
+Plot.COVID("2020-09-10", Map.Me)
+```
+
+## The Result for 09/11/2020
+
+```{r}
+Plot.COVID("2020-09-11", Map.Me)
+```
+
+## The Result for 09/12/2020
+
+```{r}
+Plot.COVID("2020-09-12", Map.Me)
+```
+
+## The Result for 09/13/2020
+
+```{r}
+Plot.COVID("2020-09-13", Map.Me)
+```
+
+## The Result for 09/14/2020
+
+```{r}
+Plot.COVID("2020-09-14", Map.Me)
+```
+
+## The Result for 09/15/2020
+
+```{r}
+Plot.COVID("2020-09-15", Map.Me)
+```
+
+
+
+## The Result for 09/16/2020
+
+```{r}
+Plot.COVID("2020-09-16", Map.Me)
+```
+
+## The Result for 09/17/2020
+
+```{r}
+Plot.COVID("2020-09-17", Map.Me)
+```
+
+## The Result for 09/18/2020
+
+```{r}
+Plot.COVID("2020-09-18", Map.Me)
+```
+
+
+## The Result for 09/19/2020
+
+```{r}
+Plot.COVID("2020-09-19", Map.Me)
+```
+
+## The Result for 09/20/2020
+
+```{r}
+Plot.COVID("2020-09-20", Map.Me)
+```
+
+
+## The Result for 09/21/2020
+
+```{r}
+Plot.COVID("2020-09-21", Map.Me)
+```
+
+## The Result for 09/22/2020
+
+```{r}
+Plot.COVID("2020-09-22", Map.Me)
+```
+
+## The Result for 09/23/2020
+
+```{r}
+Plot.COVID("2020-09-23", Map.Me)
+```
+
+## The Result for 09/24/2020
+
+```{r}
+Plot.COVID("2020-09-24", Map.Me)
+```
+
+
+## The Result for 09/25/2020
+
+```{r}
+Plot.COVID("2020-09-25", Map.Me)
+```
+
+## The Result for 09/26/2020
+
+```{r}
+Plot.COVID("2020-09-26", Map.Me)
+```
+
+## The Result for 09/27/2020
+
+```{r}
+Plot.COVID("2020-09-27", Map.Me)
+```
+
+## The Result for 09/28/2020
+
+```{r}
+Plot.COVID("2020-09-28", Map.Me)
+```
+
+## The Result for 09/29/2020
+
+```{r}
+Plot.COVID("2020-09-29", Map.Me)
+```
+
+## The Result for 09/30/2020
+
+```{r}
+Plot.COVID("2020-09-30", Map.Me)
+```
+
+## The Result for 10/01/2020
+
+```{r}
+Plot.COVID("2020-10-01", Map.Me)
+```
+
+## The Result for 10/02/2020
+
+```{r}
+Plot.COVID("2020-10-02", Map.Me)
+```
+
+## The Result for 10/03/2020
+
+```{r}
+Plot.COVID("2020-10-03", Map.Me)
+```
+
+## The Result for 10/04/2020
+
+```{r}
+Plot.COVID("2020-10-04", Map.Me)
+```
+
+## The Result for 10/05/2020
+
+```{r}
+Plot.COVID("2020-10-05", Map.Me)
+```
+
+## The Result for 10/06/2020
+
+```{r}
+Plot.COVID("2020-10-06", Map.Me)
+```
+
+
+## The Result for 10/07/2020
+
+```{r}
+Plot.COVID("2020-10-07", Map.Me)
+```
+
+## The Result for 10/08/2020
+
+```{r}
+Plot.COVID("2020-10-08", Map.Me)
+```
+
+## The Result for 10/09/2020
+
+```{r}
+Plot.COVID("2020-10-09", Map.Me)
+```
+
+## The Result for 10/10/2020
+
+```{r}
+Plot.COVID("2020-10-10", Map.Me)
+```
+
+## The Result for 10/11/2020
+
+```{r}
+Plot.COVID("2020-10-11", Map.Me)
+```
+
+## The Result for 10/12/2020
+
+```{r}
+Plot.COVID("2020-10-12", Map.Me)
+```
+
+
+## The Result for 10/13/2020
+
+```{r}
+Plot.COVID("2020-10-13", Map.Me)
+```
+
+## The Result for 10/14/2020
+
+```{r}
+Plot.COVID("2020-10-14", Map.Me)
+```
+
+## The Result for 10/15/2020
+
+```{r}
+Plot.COVID("2020-10-15", Map.Me)
+```
+
+## The Result for 10/16/2020
+
+```{r}
+Plot.COVID("2020-10-16", Map.Me)
+```
+
+## The Result for 10/17/2020
+
+```{r}
+Plot.COVID("2020-10-17", Map.Me)
+```
+
+## The Result for 10/18/2020
+
+```{r}
+Plot.COVID("2020-10-18", Map.Me)
+```
+
+## The Result for 10/19/2020
+
+```{r}
+Plot.COVID("2020-10-19", Map.Me)
+```
+
+## The Result for 10/20/2020
+
+```{r}
+Plot.COVID("2020-10-20", Map.Me)
+```
+
+## The Result for 10/21/2020
+
+```{r}
+Plot.COVID("2020-10-21", Map.Me)
+```
+
+## The Result for 10/22/2020
+
+```{r}
+Plot.COVID("2020-10-22", Map.Me)
+```
+
+## The Result for 10/23/2020
+
+```{r}
+Plot.COVID("2020-10-23", Map.Me)
+```
+
+## The Result for 10/24/2020
+
+```{r}
+Plot.COVID("2020-10-24", Map.Me)
+```
+
+## The Result for 10/25/2020
+
+```{r}
+Plot.COVID("2020-10-25", Map.Me)
+```
+
+## The Result for 10/26/2020
+
+```{r}
+Plot.COVID("2020-10-26", Map.Me)
+```
+
+## The Result for 10/27/2020
+
+```{r}
+Plot.COVID("2020-10-27", Map.Me)
+```
+
+## The Result for 10/28/2020
+
+```{r}
+Plot.COVID("2020-10-28", Map.Me)
+```
+
+## The Result for 10/29/2020
+
+```{r}
+Plot.COVID("2020-10-29", Map.Me)
+```
+
+## The Result for 10/30/2020
+
+```{r}
+Plot.COVID("2020-10-30", Map.Me)
+```
+
+## The Result for 10/31/2020
+
+```{r}
+Plot.COVID("2020-10-31", Map.Me)
+```
+
+## The Result for 11/01/2020
+
+```{r}
+Plot.COVID("2020-11-01", Map.Me)
+```
+
+## The Result for 11/02/2020
+
+```{r}
+Plot.COVID("2020-11-02", Map.Me)
+```
+
+## The Result for 11/03/2020
+
+```{r}
+Plot.COVID("2020-11-03", Map.Me)
+```
+
+## The Result for 11/04/2020
+
+```{r}
+Plot.COVID("2020-11-04", Map.Me)
+```
+
+## The Result for 11/05/2020
+
+```{r}
+Plot.COVID("2020-11-05", Map.Me)
+```
+
+## The Result for 11/06/2020
+
+```{r}
+Plot.COVID("2020-11-06", Map.Me)
+```
+
+
+## The Result for 11/07/2020
+
+```{r}
+Plot.COVID("2020-11-07", Map.Me)
+```
+
+## The Result for 11/08/2020
+
+```{r}
+Plot.COVID("2020-11-08", Map.Me)
+```
+
+## The Result for 11/09/2020
+
+```{r}
+Plot.COVID("2020-11-09", Map.Me)
+```
+
+
+## The Result for 11/10/2020
+
+```{r}
+Plot.COVID("2020-11-10", Map.Me)
+```
+
+## The Result for 11/11/2020
+
+```{r}
+Plot.COVID("2020-11-11", Map.Me)
+```
+
+
+## The Result for 11/12/2020
+
+```{r}
+Plot.COVID("2020-11-12", Map.Me)
+```
+
+## The Result for 11/13/2020
+
+```{r}
+Plot.COVID("2020-11-13", Map.Me)
+```
+
+## The Result for 11/14/2020
+
+```{r}
+Plot.COVID("2020-11-14", Map.Me)
+```
+
+## The Result for 11/15/2020
+
+```{r}
+Plot.COVID("2020-11-15", Map.Me)
+```
+
+## The Result for 11/16/2020
+
+```{r}
+Plot.COVID("2020-11-16", Map.Me)
+```
+
+
+## The Result for 11/17/2020
+
+```{r}
+Plot.COVID("2020-11-17", Map.Me)
+```
+
+## The Result for 11/18/2020
+
+```{r}
+Plot.COVID("2020-11-18", Map.Me)
+```
+
+
+## The Result for 11/19/2020
+
+```{r}
+Plot.COVID("2020-11-19", Map.Me)
+```
+
+## The Result for 11/20/2020
+
+```{r}
+Plot.COVID("2020-11-20", Map.Me)
+```
+
+## The Result for 11/21/2020
+
+```{r}
+Plot.COVID("2020-11-21", Map.Me)
+```
+
+## The Result for 11/22/2020
+
+```{r}
+Plot.COVID("2020-11-22", Map.Me)
+```
+
+## The Result for 11/23/2020
+
+```{r}
+Plot.COVID("2020-11-23", Map.Me)
+```
+
+## The Result for 11/24/2020
+
+```{r}
+Plot.COVID("2020-11-24", Map.Me)
+```
+
+## The Result for 11/25/2020
+
+```{r}
+Plot.COVID("2020-11-25", Map.Me)
+```
+
+## The Result for 11/26/2020
+
+```{r}
+Plot.COVID("2020-11-26", Map.Me)
+```
+
+## The Result for 11/27/2020
+
+```{r}
+Plot.COVID("2020-11-27", Map.Me)
+```
+
+
+## The Result for 11/28/2020
+
+```{r}
+Plot.COVID("2020-11-28", Map.Me)
+```
+
+## The Result for 11/29/2020
+
+```{r}
+Plot.COVID("2020-11-29", Map.Me)
+```
+
+## The Result for 11/30/2020
+
+```{r}
+Plot.COVID("2020-11-30", Map.Me)
+```
+
+
+## The Result for 12/01/2020
+
+```{r, warning=FALSE, message=FALSE, cache=FALSE}
+library(widgetframe); library(ggthemes); library(RColorBrewer)
+Map.Me <- Map.Me %>% 
+  mutate(TTip = paste0("Deaths: ",Deaths,"<br> Negative Tests:",Negative.test.results))
+Res.1 <- Map.Me %>% 
+  filter(date==max(date))
+Res1 <- ggplot(Res.1, aes(geometry=geometry, fill=Number.of.cases, label=NAME, text=TTip)) + 
+  geom_sf() + 
+  scale_fill_viridis_c(option = "A") +
+  theme_map() + 
+  labs(title="COVID-19 in Oregon", subtitle=Sys.Date(), x="", y="", caption="Made with R, ggplot2, and ggrepel by @PieRatio \n data: https://govstatus.egov.com/OR-OHA-COVID-19", fill="COVID-19 Cases")
+```
+
+
+## A Plotly
+
+```{r PLTL, warning=FALSE, message=FALSE, cache=FALSE}
+library(plotly)
+GGP <- ggplotly(Res1)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(GGP), here:::here('static/img/widgets/covidmap.html'))
+```
+
+<iframe width="600" height="405" src="https://rww.science/img/widgets/covidmap.html" frameborder="0" allowfullscreen></iframe>

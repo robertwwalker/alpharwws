@@ -1,0 +1,89 @@
+# Settings not listed here are inherited from `_default/config.toml`
+## This is a more extensive example of the themes capabilities that pulls from the local `exampleSite`
+## Run `hugo server` to load this demo
+
+### For Pages the .RelPermalink must match the menu .URL
+### For sections the name/directory must match the menu .Identifier
+[menu]
+  [[menu.main]]
+    identifier = "about"
+    name = "About..."
+    url = "/authors/"
+    weight = 10
+  [[menu.main]]
+    identifier = "courses"
+    name = "Courses"
+    url = "/courses/"
+    weight = 20
+  [[menu.main]]
+    identifier = "blog"
+    name = "Blog"
+    url = "/blog/"
+    weight = 30
+#  [[menu.main]]
+#    identifier = "contact"
+#    name = "Contact"
+#    url = "/contact/"
+#    weight = 20
+  [[menu.main]]
+    identifier = "r"
+    name = "R"
+    url = "/R/"
+    weight = 40
+  [[menu.main]]
+    identifier = "pubs"
+    name = "Publications"
+    url = "/publication/"
+    weight = 50
+  [[menu.main]]
+    identifier = "cv"
+    name = "C.V."
+    url = "/cv/"
+    weight = 60
+  [[menu.main]]
+    identifier = "taxonomies"
+    name = "Taxonomies"
+    url = "#"
+    weight = 70
+  [[menu.main]]
+    parent = "taxonomies"
+    identifier = "categories"
+    name = "Categories"
+    url = "/categories/"
+    weight = 71
+  [[menu.main]]
+    parent = "taxonomies"
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 71
+
+#  [[menu.main]]
+#    identifier = "submenu"
+#    name = "Submenu"
+#    url = "#"
+#    weight = 50
+#  [[menu.main]]
+#    parent = "submenu"
+#    identifier = "one"
+#    name = "Option One"
+#    url = "#"
+#    weight = 51
+#  [[menu.main]]
+#    parent = "submenu"
+#    identifier = "two"
+#    name = "Option Two"
+#    url = "#"
+#    weight = 52
+#  [[menu.main]]
+#    parent = "submenu"
+#    identifier = "three"
+#    name = "Option Three"
+#    url = "#"
+#    weight = 53
+#  [[menu.main]]
+#    parent = "submenu"
+#    identifier = "four"
+#    name = "Option Four"
+#    url = "#"
+#    weight = 54

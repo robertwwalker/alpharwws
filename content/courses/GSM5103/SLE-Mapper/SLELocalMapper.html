@@ -1,0 +1,113 @@
+---
+title: "Local Salem Area Maps"
+author: "Robert W. Walker"
+date: "11/23/2019"
+output: html_document
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="a-citation" class="section level1">
+<h1>A Citation</h1>
+<p>I found a starting point on <a href="https://www.littlemissdata.com/blog/maps">local maps in Seattle</a>.</p>
+<pre class="r"><code>library(ggmap)</code></pre>
+<pre><code>## Loading required package: ggplot2</code></pre>
+<pre><code>## Google&#39;s Terms of Service: https://cloud.google.com/maps-platform/terms/.</code></pre>
+<pre><code>## Please cite ggmap if you use it! See citation(&quot;ggmap&quot;) for details.</code></pre>
+<pre class="r"><code>library(osmdata)</code></pre>
+<pre><code>## Data (c) OpenStreetMap contributors, ODbL 1.0. https://www.openstreetmap.org/copyright</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## ── Attaching packages ─────────────────────────────────────── tidyverse 1.3.0 ──</code></pre>
+<pre><code>## ✓ tibble  3.0.4     ✓ dplyr   1.0.2
+## ✓ tidyr   1.1.2     ✓ stringr 1.4.0
+## ✓ readr   1.4.0     ✓ forcats 0.5.0
+## ✓ purrr   0.3.4</code></pre>
+<pre><code>## ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>SLE &lt;- get_map(getbb(&quot;Salem, OR&quot;), source=&quot;osm&quot;)</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/647/1473.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/648/1473.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/649/1473.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/647/1474.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/648/1474.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/649/1474.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/647/1475.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/648/1475.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/12/649/1475.png</code></pre>
+<pre class="r"><code>SLE %&gt;% ggmap()</code></pre>
+<p><img src="/courses/GSM5103/SLE-Mapper/SLELocalMapper_files/figure-html/cars-1.png" width="672" /></p>
+<div id="an-oregon-map-of-liquor-stores" class="section level2">
+<h2>An Oregon Map of Liquor Stores</h2>
+<p>The setup for a Google Cloud account is kind of a pain and it requires a billing option. That was annoying but eventually fixed.</p>
+<pre class="r"><code>OR &lt;- get_map(getbb(&quot;Oregon&quot;), source=&quot;osm&quot;)</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/19/45.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/20/45.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/21/45.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/22/45.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/19/46.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/20/46.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/21/46.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/22/46.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/19/47.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/20/47.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/21/47.png</code></pre>
+<pre><code>## Source : http://tile.stamen.com/terrain/7/22/47.png</code></pre>
+<pre class="r"><code>OR %&gt;% ggmap()</code></pre>
+<p><img src="/courses/GSM5103/SLE-Mapper/SLELocalMapper_files/figure-html/MapMe-1.png" width="672" /></p>
+<pre class="r"><code># Get the Data on Liquor Stores from https://ryano.net/oregonliquorstores/  I copied and pasted it.  It comes from a .pdf available from OLCC.
+library(readr)
+GeoCodeLiquorStores &lt;- read_delim(url(&quot;https://github.com/robertwwalker/DADMStuff/raw/master/GeoCodeLiquorStores.csv&quot;), &quot;\t&quot;, escape_double = FALSE, trim_ws = TRUE)</code></pre>
+<pre><code>## 
+## ── Column specification ────────────────────────────────────────────────────────
+## cols(
+##   `Store  [pdx]` = col_character(),
+##   Address = col_character(),
+##   Mon = col_character(),
+##   Tue = col_character(),
+##   Wed = col_character(),
+##   Thu = col_character(),
+##   Fri = col_character(),
+##   Sat = col_character(),
+##   Sun = col_character()
+## )</code></pre>
+<pre class="r"><code>GeoCodeLiquorStores$GCAdd &lt;- str_split_fixed(GeoCodeLiquorStores$Address, fixed(&quot;(&quot;), 2)[,1]
+GeoCodeLiquorStores$GCPhN &lt;- str_split_fixed(GeoCodeLiquorStores$Address, fixed(&quot;(&quot;), 2)[,2]</code></pre>
+<p>Now I need a new package to try and geocode this.</p>
+<pre><code>install.packages(&quot;RDSTK&quot;)</code></pre>
+<pre class="r"><code># GeoCode the addresses from above.
+# Google will charge for this, not much but it is a pain to set up
+# LatLon.LS &lt;- geocode(GeoCodeLiquorStores$GCAdd, source = &quot;google&quot;)
+# Embedded Output in lat lon
+LatLon.LS &lt;-read.csv(url(&quot;https://github.com/robertwwalker/DADMStuff/raw/master/GeoCodedLiquor.csv&quot;))
+# Merge coordinates with the dataset of liquor stores
+GCLS &lt;- GeoCodeLiquorStores %&gt;% mutate(lat = LatLon.LS$lat, lon=LatLon.LS$lon)
+# Rename the first variable
+names(GCLS)[1] &lt;- &quot;Store&quot;
+# Create the hover
+GCLS &lt;- GCLS %&gt;% mutate(labelM = paste0(Store,&quot;&lt;br&gt;&quot;,GCAdd,&quot;&lt;br&gt;&quot;,GCPhN))
+gp &lt;- ggmap(OR) + geom_point(data=GCLS, aes(x=lon, y=lat, text=labelM), alpha=0.2, size=2, color=&quot;magenta&quot;) + ggnetwork::theme_blank() + labs(&quot;A Map of Oregon Liquor Stores&quot;) </code></pre>
+<pre><code>## Warning: Ignoring unknown aesthetics: text</code></pre>
+<pre class="r"><code>library(plotly)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;plotly&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggmap&#39;:
+## 
+##     wind</code></pre>
+<pre><code>## The following object is masked from &#39;package:ggplot2&#39;:
+## 
+##     last_plot</code></pre>
+<pre><code>## The following object is masked from &#39;package:stats&#39;:
+## 
+##     filter</code></pre>
+<pre><code>## The following object is masked from &#39;package:graphics&#39;:
+## 
+##     layout</code></pre>
+<pre class="r"><code>GGP &lt;- ggplotly(gp, tooltip = &quot;text&quot;)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(GGP), here:::here(&#39;static/img/widgets/sleggpmap.html&#39;))</code></pre>
+<iframe width="600" height="600" src="https://rww.science/img/widgets/sleggpmap.html" frameborder="0" allowfullscreen>
+</iframe>
+</div>
+</div>

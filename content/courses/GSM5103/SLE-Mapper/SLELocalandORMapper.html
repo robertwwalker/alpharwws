@@ -1,0 +1,50 @@
+---
+title: "Local Salem Area Maps"
+author: "Robert W. Walker"
+date: "11/23/2019"
+output: html_document
+---
+
+<script src="/rmarkdown-libs/header-attrs/header-attrs.js"></script>
+
+
+<div id="a-citation" class="section level1">
+<h1>A Citation</h1>
+<p>I found a starting point on <a href="https://www.littlemissdata.com/blog/maps">local maps in Seattle</a>.</p>
+<pre class="r"><code>library(ggmap)
+library(osmdata)
+library(tidyverse)
+# SLE &lt;- get_map(getbb(&quot;Salem, OR&quot;), source=&quot;osm&quot;)
+# SLE %&gt;% ggmap()</code></pre>
+<div id="an-oregon-map-of-liquor-stores" class="section level2">
+<h2>An Oregon Map of Liquor Stores</h2>
+<p>The setup for a Google Cloud account is kind of a pain and it requires a billing option. That was annoying but eventually fixed. It is required for geocoding addresses as OSM doesn’t do that anymore.</p>
+<pre class="r"><code>OR &lt;- get_map(getbb(&quot;Oregon&quot;), source=&quot;osm&quot;)
+OR %&gt;% ggmap()</code></pre>
+<p><img src="/courses/GSM5103/SLE-Mapper/SLELocalandORMapper_files/figure-html/MapMe-1.png" width="672" /></p>
+<pre class="r"><code># Get the Data on Liquor Stores from https://ryano.net/oregonliquorstores/  I copied and pasted it.  It comes from a .pdf available from OLCC.
+library(readr)
+GeoCodeLiquorStores &lt;- read_delim(url(&quot;https://github.com/robertwwalker/DADMStuff/raw/master/GeoCodeLiquorStores.csv&quot;), &quot;\t&quot;, escape_double = FALSE, trim_ws = TRUE)
+# Split the Address into the Address part and the phone number part
+GeoCodeLiquorStores$GCAdd &lt;- str_split_fixed(GeoCodeLiquorStores$Address, fixed(&quot;(&quot;), 2)[,1]
+GeoCodeLiquorStores$GCPhN &lt;- str_split_fixed(GeoCodeLiquorStores$Address, fixed(&quot;(&quot;), 2)[,2]
+# GeoCode the addresses from above.
+# Google will charge for this, not much but it is a pain to set up
+# LatLon.LS &lt;- geocode(GeoCodeLiquorStores$GCAdd, source = &quot;google&quot;)
+# Embedded Output in lat lon
+LatLon.LS &lt;-read.csv(url(&quot;https://github.com/robertwwalker/DADMStuff/raw/master/GeoCodedLiquor.csv&quot;))
+# Merge coordinates with the dataset of liquor stores
+GCLS &lt;- GeoCodeLiquorStores %&gt;% mutate(lat = LatLon.LS$lat, lon=LatLon.LS$lon)
+# Rename the first variable
+names(GCLS)[1] &lt;- &quot;Store&quot;
+# Create the hover
+GCLS &lt;- GCLS %&gt;% mutate(labelM = paste0(Store,&quot;&lt;br&gt;&quot;,GCAdd,&quot;&lt;br&gt;&quot;,GCPhN))
+gp &lt;- ggmap(OR) + geom_point(data=GCLS, aes(x=lon, y=lat, text=labelM), alpha=0.2, size=2, color=&quot;magenta&quot;) + ggnetwork::theme_blank() + labs(&quot;A Map of Oregon Liquor Stores&quot;) 
+library(plotly)
+GGP &lt;- ggplotly(gp, tooltip = &quot;text&quot;)
+htmlwidgets::saveWidget(
+  widgetframe::frameableWidget(GGP), here:::here(&#39;static/img/widgets/sleorggpmap.html&#39;))</code></pre>
+<iframe width="600" height="600" src="https://rww.science/img/widgets/sleorggpmap.html" frameborder="0" allowfullscreen>
+</iframe>
+</div>
+</div>

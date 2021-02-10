@@ -1,0 +1,56 @@
+### Banner ###
+banner:
+  enable: true
+  image: 'img/banner.jpg'
+  title: "rww.science"
+  content: "" # Change this if you want something other then the site description
+#  buttons:
+#    - title: "Sign Up"
+#      link: "#"
+#      class: "primary"
+#    - title: "Learn More"
+#      link: "#"
+
+### Highlight ###
+highlight:
+  enable: true
+  header: "Robert W. Walker, Ph. D."
+  content: "I am Associate Professor of Quantitative Methods in the Atkinson Graduate School of Management and the Committee of Studies in Data Science of Willamette University.  Maria and I are the proud parents to two wonderful sons.  I generally like the Pacific Northwest, and, to keep things in balance, am a lifelong Arsenal fan."
+#  image: "img/icon.png"
+
+### Features ###
+features:
+  enable: true
+  rows:
+    - items:
+      - title: "R User"
+        icon: "fa-registered"
+        accent: "accent1" #accent values are 1-8
+        content: 'I blog on data using R.'
+      - title: "Political Economist/Data Scientist"
+        icon: "fa-globe"
+        accent: "accent2" #accent values are 1-8
+        content: "I work on academic problems in political economy and statistics."
+    - items:
+        - title: "Professor"
+          icon: "fa-university"
+          accent: "accent4" #accent values are 1-8
+          content: "I teach applied statistics, data science, and political economy."
+        - title: "Arsenal fan"
+          icon: "fa-table"
+          accent: "accent6" #accent values are 1-8
+          content: "I am a long suffering fan of the Gunners."
+
+### Blog ###
+blog:
+  enable: true
+  # Leave header text blank to remove entire <section>
+  header: "Recent Posts"
+  buttonText: "Read More"
+  postCount: 6
+
+### Call to Action ###
+cta:
+  enable: false
+  header: "Sign up for beta access"
+  content: "Blandit varius ut praesent nascetur eu penatibus nisi risus faucibus nunc."

@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+  <head>
+    <title>Decomposition</title>
+    <meta charset="utf-8" />
+    <meta name="author" content="Robert W. Walker" />
+    <meta name="date" content="2021-02-06" />
+    <script src="libs/header-attrs/header-attrs.js"></script>
+    <link rel="stylesheet" href="xaringan-themer.css" type="text/css" />
+  </head>
+  <body>
+    <textarea id="source">
+class: center, middle, inverse, title-slide
+
+# Decomposition
+## FPP3, Chapter 3
+### Robert W. Walker
+### AGSM
+### 2021-02-06
+
+---
+
+
+
+
+
+
+
+
+# Transformations and adjustments
+
+---
+
+Getting started
+
+```
+library(tidyverse)
+library(fpp3)
+library(purrr)
+library(gganimate)
+```
+
+---
+
+## Filter Australia
+
+
+```r
+global_economy %&gt;%
+  filter(Country == "Australia") %&gt;%
+  autoplot(GDP)  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/gdp-per-capita-1.png" width="576" /&gt;
+
+---
+
+# How to Adjust?
+
+---
+
+## Per capita adjustments
+
+
+```r
+global_economy %&gt;%
+  filter(Country == "Australia") %&gt;%
+  autoplot(GDP / Population) + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/gdp-per-capita2-1.png" width="576" /&gt;
+
+---
+
+## Have a look....  
+
+Consider the GDP information in `global_economy`. Plot the GDP per capita for each country over time. Which country has the highest GDP per capita? How has this changed over time?
+
+---
+
+
+```r
+global_economy %&gt;% mutate(GDPPC = GDP / Population) %&gt;% select(Country, Year, GDPPC) %&gt;% top_n(., 10, wt=GDPPC) 
+```
+
+```
+## # A tsibble: 10 x 3 [1Y]
+## # Key:       Country [2]
+##    Country        Year   GDPPC
+##    &lt;fct&gt;         &lt;dbl&gt;   &lt;dbl&gt;
+##  1 Liechtenstein  2013 173528.
+##  2 Liechtenstein  2014 179308.
+##  3 Liechtenstein  2015 167591.
+##  4 Liechtenstein  2016 164993.
+##  5 Monaco         2007 167125.
+##  6 Monaco         2008 180640.
+##  7 Monaco         2013 172589.
+##  8 Monaco         2014 185153.
+##  9 Monaco         2015 163369.
+## 10 Monaco         2016 168011.
+```
+
+---
+
+
+```r
+global_economy %&gt;% autoplot(GDP / Population) + guides(color=FALSE) + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-2-1.png" width="576" /&gt;
+
+
+---
+
+## Inflation adjustments
+
+
+```r
+print_retail &lt;- aus_retail %&gt;%
+  filter(Industry == "Newspaper and book retailing") %&gt;%
+  group_by(Industry) %&gt;%
+  index_by(Year = year(Month)) %&gt;%
+  summarise(Turnover = sum(Turnover))
+aus_economy &lt;- filter(global_economy, Code == "AUS")
+print_retail %&gt;%
+  left_join(aus_economy, by = "Year") %&gt;%
+  mutate(Adj_turnover = Turnover / CPI) %&gt;%
+  pivot_longer(c(Turnover, Adj_turnover),
+    names_to = "Type", values_to = "Turnover"
+  ) %&gt;%
+  ggplot(aes(x = Year, y = Turnover)) +
+  geom_line() +
+  facet_grid(vars(Type), scales = "free_y") +
+  xlab("Years") + ylab(NULL) +
+  ggtitle("Turnover: Australian print media industry")  + theme_xaringan()
+```
+
+---
+
+&lt;img src="index_files/figure-html/retail_cpi2-1.png" width="576" /&gt;
+
+---
+
+## Mathematical transformations
+
+If the data show different variation at different levels of the series, then a transformation can be useful.
+
+Denote original observations as `\(y_1,\dots,y_n\)` and transformed
+observations as `\(w_1, \dots, w_n\)`.
+
+|Transformations |  | 
+|---------|----|
+|Square root | `\(w_t = \sqrt{y_t}\)`   | `\(\downarrow\)`
+|Cube root   | `\(w_t = \sqrt[3]{y_t}\)`| Increasing
+|Logarithm   | `\(w_t = \log(y_t)\)`    | strength
+
+Logarithms, in particular, are useful because they are more interpretable: changes in a log value are **relative (percent) changes on the original scale**.
+
+---
+
+## Mathematical transformations
+
+
+```r
+food &lt;- aus_retail %&gt;%
+  filter(Industry == "Food retailing") %&gt;%
+  summarise(Turnover = sum(Turnover))
+```
+
+---
+
+&lt;img src="index_files/figure-html/food-plot-1.png" width="576" /&gt;
+
+---
+
+## Mathematical transformations
+
+
+```r
+food %&gt;% autoplot(sqrt(Turnover)) +
+  labs(y = "Square root turnover")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/food-sqrt1-1.png" width="576" /&gt;
+
+---
+
+## Mathematical transformations
+
+
+```r
+food %&gt;% autoplot(Turnover^(1/3)) +
+  labs(y = "Cube root turnover")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/food-cbrt-1.png" width="576" /&gt;
+
+---
+
+## Mathematical transformations
+
+
+```r
+food %&gt;% autoplot(log(Turnover)) +
+  labs(y = "Log turnover")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/food-log-1.png" width="576" /&gt;
+
+---
+
+## Mathematical transformations
+
+
+```r
+food %&gt;% autoplot(-1/Turnover) +
+  labs(y = "Inverse turnover")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/food-inverse-1.png" width="576" /&gt;
+
+---
+
+## Box-Cox transformations
+
+Each of these transformations is close to a member of the
+family of **Box-Cox transformations**:
+`$$w_t = \left\{\begin{array}{ll}
+        \log(y_t),      &amp; \quad \lambda = 0; \\
+        (y_t^\lambda-1)/\lambda ,         &amp; \quad \lambda \ne 0.
+\end{array}\right.$$`
+
+* `\(\lambda=1\)`: (No substantive transformation)
+* `\(\lambda=\frac12\)`: (Square root plus linear transformation)
+* `\(\lambda=0\)`: (Natural logarithm)
+* `\(\lambda=-1\)`: (Inverse plus 1)
+
+---
+
+## Box-Cox transformations
+
+
+```
+## NULL
+```
+
+---
+
+## Box-Cox transformations
+
+
+```r
+food %&gt;%
+  features(Turnover, features = guerrero)
+```
+
+```
+## # A tibble: 1 x 1
+##   lambda_guerrero
+##             &lt;dbl&gt;
+## 1          0.0524
+```
+
+* This attempts to balance the seasonal fluctuations and random variation across the series.
+* Always check the results.
+* A low value of `\(\lambda\)` can give extremely large prediction intervals.
+
+---
+
+## Box-Cox transformations
+
+
+```r
+food %&gt;% autoplot(box_cox(Turnover, 0.0524)) +
+  labs(y = "Box-Cox transformed turnover")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/food-bc-1.png" width="576" /&gt;
+
+---
+
+## Transformations
+
+* Often no transformation needed.
+* Simple transformations are easier to explain and work well enough.
+* Transformations can have very large effect on PI.
+* If the data contains zeros, then don't take logs.
+* `logp1()` can be useful for data with zeros.
+* If some data are negative, no power transformation is possible unless a constant is added to all values.
+* Choosing logs is a simple way to force forecasts to be positive
+* Transformations must be reversed to obtain forecasts on the original scale. (Handled automatically by `fable`.)
+
+---
+
+## [For Homework..] Have a go...
+
+1. For the following series, find an appropriate transformation in order to stabilise the variance.
+
+    * United States GDP from `global_economy`
+    * Slaughter of Victorian “Bulls, bullocks and steers” in `aus_livestock`
+    * Victorian Electricity Demand from `vic_elec`.
+    * Gas production from `aus_production`
+
+2. Why is a Box-Cox transformation unhelpful for the `canadian_gas` data?
+
+---
+
+# Time series components
+
+---
+
+## Time series patterns
+
+**Recall**
+
+Trend
+:  pattern exists when there is a long-term increase or decrease in the data.
+
+Cyclic
+: pattern exists when data exhibit rises and falls that are *not of fixed period* (duration usually of at least 2 years).
+
+Seasonal: pattern exists when a series is influenced by seasonal factors (e.g., the quarter of the year, the month, or day of the week).
+
+---
+
+# A Note on DeSeasoning
+
+
+```r
+us_retail_employment &lt;- us_employment %&gt;%
+  filter(year(Month) &gt;= 1990, Title == "Retail Trade") %&gt;%
+  select(-Series_ID)
+dcmp &lt;- us_retail_employment %&gt;%
+  model(STL(Employed))
+autoplot(us_retail_employment, Employed, color = "gray") +
+  autolayer(components(dcmp), season_adjust, color = "blue") +
+  labs(y = "Persons (thousands)", title = "Total employment in US retail")
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-3-1.png" width="576" /&gt;
+
+# Moving Averages
+
+---
+
+The general idea is a moving window.  We will set `.before` and `.after` as follows.
+
+
+```r
+aus_exports &lt;- global_economy %&gt;%
+  filter(Country == "Australia") %&gt;%
+  mutate(
+    `5-MA` = slider::slide_dbl(Exports, mean, .before = 2, .after = 2, .complete = TRUE)
+  )
+aus_exports
+```
+
+```
+## # A tsibble: 58 x 10 [1Y]
+## # Key:       Country [1]
+##    Country   Code   Year        GDP Growth   CPI Imports Exports Population `5-MA`
+##    &lt;fct&gt;     &lt;fct&gt; &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Australia AUS    1960    1.86e10  NA     7.96    14.1    13.0   10276477   NA  
+##  2 Australia AUS    1961    1.96e10   2.49  8.14    15.0    12.4   10483000   NA  
+##  3 Australia AUS    1962    1.99e10   1.30  8.12    12.6    13.9   10742000   13.5
+##  4 Australia AUS    1963    2.15e10   6.21  8.17    13.8    13.0   10950000   13.5
+##  5 Australia AUS    1964    2.38e10   6.98  8.40    13.8    14.9   11167000   13.6
+##  6 Australia AUS    1965    2.59e10   5.98  8.69    15.3    13.2   11388000   13.4
+##  7 Australia AUS    1966    2.73e10   2.38  8.98    15.1    12.9   11651000   13.3
+##  8 Australia AUS    1967    3.04e10   6.30  9.29    13.9    12.9   11799000   12.7
+##  9 Australia AUS    1968    3.27e10   5.10  9.52    14.5    12.3   12009000   12.6
+## 10 Australia AUS    1969    3.66e10   7.04  9.83    13.3    12.0   12263000   12.6
+## # … with 48 more rows
+```
+
+---
+
+
+```r
+autoplot(aus_exports, Exports) +
+  autolayer(aus_exports, `5-MA`, color = "red") +
+  labs(y = "Exports (% of GDP)", title = "Total Australian exports") +
+  guides(colour = guide_legend(title = "series"))+ theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-5-1.png" width="576" /&gt;
+
+---
+
+## We can even have moving averages of moving averages.
+
+---
+
+
+```r
+aus_exports2 &lt;- aus_exports %&gt;% 
+  mutate(`2x5-MA` = slider::slide_dbl(`5-MA`, mean, .before = 1, .after = 0, .complete = TRUE)
+  )
+aus_exports2
+```
+
+```
+## # A tsibble: 58 x 11 [1Y]
+## # Key:       Country [1]
+##    Country Code   Year     GDP Growth   CPI Imports Exports Population `5-MA`
+##    &lt;fct&gt;   &lt;fct&gt; &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;      &lt;dbl&gt;  &lt;dbl&gt;
+##  1 Austra… AUS    1960 1.86e10  NA     7.96    14.1    13.0   10276477   NA  
+##  2 Austra… AUS    1961 1.96e10   2.49  8.14    15.0    12.4   10483000   NA  
+##  3 Austra… AUS    1962 1.99e10   1.30  8.12    12.6    13.9   10742000   13.5
+##  4 Austra… AUS    1963 2.15e10   6.21  8.17    13.8    13.0   10950000   13.5
+##  5 Austra… AUS    1964 2.38e10   6.98  8.40    13.8    14.9   11167000   13.6
+##  6 Austra… AUS    1965 2.59e10   5.98  8.69    15.3    13.2   11388000   13.4
+##  7 Austra… AUS    1966 2.73e10   2.38  8.98    15.1    12.9   11651000   13.3
+##  8 Austra… AUS    1967 3.04e10   6.30  9.29    13.9    12.9   11799000   12.7
+##  9 Austra… AUS    1968 3.27e10   5.10  9.52    14.5    12.3   12009000   12.6
+## 10 Austra… AUS    1969 3.66e10   7.04  9.83    13.3    12.0   12263000   12.6
+## # … with 48 more rows, and 1 more variable: `2x5-MA` &lt;dbl&gt;
+```
+
+---
+
+
+```r
+autoplot(aus_exports2, Exports) +
+  autolayer(aus_exports2, `5-MA`, color = "red") +
+  autolayer(aus_exports2, `2x5-MA`, color = "blue") +
+  labs(y = "Exports (% of GDP)", title = "Total Australian exports") +
+  guides(colour = guide_legend(title = "series")) + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-7-1.png" width="576" /&gt;
+
+
+---
+
+
+## Time series decomposition
+
+`$$y_t = f(S_t, T_t, R_t)$$`
+
+where 
+`\(y_t=\)`: data at period `\(t\)`  
+
+`\(T_t=\)`: trend-cycle component at period `\(t\)`
+
+`\(S_t=\)` &amp; seasonal component at period `\(t\)`  
+
+`\(R_t=\)` &amp; remainder component at period `\(t\)`  
+
+**Additive decomposition:** `\(y_t = S_t + T_t + R_t.\)`
+
+**Multiplicative decomposition:** `\(y_t = S_t \times T_t \times R_t.\)`
+
+---
+
+## Time series decomposition
+
+  *  Additive model  appropriate if  magnitude of  seasonal fluctuations does not vary with level.
+  *  If seasonal are proportional to level of series, then multiplicative model appropriate.
+  *  Multiplicative decomposition more prevalent with economic series
+  *  Alternative: use a Box-Cox transformation, and then use additive decomposition.
+  *  Logs turn multiplicative relationship into an additive relationship:
+
+`$$y_t = S_t \times T_t \times E_t \quad\Rightarrow\quad
+\log y_t = \log S_t + \log T_t + \log R_t.$$`
+
+---
+
+## US Retail Employment
+
+
+```r
+us_retail_employment &lt;- us_employment %&gt;%
+  filter(year(Month) &gt;= 1990, Title == "Retail Trade") %&gt;%
+  select(-Series_ID)
+us_retail_employment
+```
+
+```
+## # A tsibble: 357 x 3 [1M]
+##       Month Title        Employed
+##       &lt;mth&gt; &lt;chr&gt;           &lt;dbl&gt;
+##  1 1990 Jan Retail Trade   13256.
+##  2 1990 Feb Retail Trade   12966.
+##  3 1990 Mar Retail Trade   12938.
+##  4 1990 Apr Retail Trade   13012.
+##  5 1990 May Retail Trade   13108.
+##  6 1990 Jun Retail Trade   13183.
+##  7 1990 Jul Retail Trade   13170.
+##  8 1990 Aug Retail Trade   13160.
+##  9 1990 Sep Retail Trade   13113.
+## 10 1990 Oct Retail Trade   13185.
+## # … with 347 more rows
+```
+
+---
+
+## US Retail Employment
+
+
+```r
+us_retail_employment %&gt;%
+  autoplot(Employed) +
+  xlab("Year") + ylab("Persons (thousands)") +
+  ggtitle("Total employment in US retail")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/dable1-1.png" width="576" /&gt;
+
+---
+
+
+```r
+USREDC &lt;- us_retail_employment %&gt;%
+  model(classical_decomposition(Employed, type = "additive")) %&gt;%
+  components()
+USREDC
+```
+
+```
+## # A dable:                 357 x 7 [1M]
+## # Key:                     .model [1]
+## # Classical Decomposition: Employed = trend + seasonal + random
+##    .model                      Month Employed  trend seasonal random season_adjust
+##    &lt;chr&gt;                       &lt;mth&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;  &lt;dbl&gt;         &lt;dbl&gt;
+##  1 "classical_decompositio… 1990 Jan   13256.    NA    -75.5   NA           13331.
+##  2 "classical_decompositio… 1990 Feb   12966.    NA   -273.    NA           13239.
+##  3 "classical_decompositio… 1990 Mar   12938.    NA   -253.    NA           13191.
+##  4 "classical_decompositio… 1990 Apr   13012.    NA   -190.    NA           13203.
+##  5 "classical_decompositio… 1990 May   13108.    NA    -88.9   NA           13197.
+##  6 "classical_decompositio… 1990 Jun   13183.    NA    -10.4   NA           13193.
+##  7 "classical_decompositio… 1990 Jul   13170. 13178.   -13.3    5.65        13183.
+##  8 "classical_decompositio… 1990 Aug   13160. 13161.    -9.99   8.80        13169.
+##  9 "classical_decompositio… 1990 Sep   13113. 13141.   -87.4   59.9         13201.
+## 10 "classical_decompositio… 1990 Oct   13185. 13117.    34.6   33.8         13151.
+## # … with 347 more rows
+```
+
+---
+
+
+```r
+autoplot(USREDC) +
+  labs(title = "Classical additive decomposition of total US retail employment") + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-9-1.png" width="576" /&gt;
+
+---
+
+## US Retail Employment
+
+
+```r
+us_retail_employment %&gt;%
+  model(stl = STL(Employed))
+```
+
+```
+## # A mable: 1 x 1
+##       stl
+##   &lt;model&gt;
+## 1   &lt;STL&gt;
+```
+
+---
+
+## US Retail Employment
+
+
+```r
+dcmp &lt;- us_retail_employment %&gt;%
+  model(stl = STL(Employed))
+components(dcmp)
+```
+
+```
+## # A dable:           357 x 7 [1M]
+## # Key:               .model [1]
+## # STL Decomposition: Employed = trend + season_year + remainder
+##    .model    Month Employed  trend season_year remainder season_adjust
+##    &lt;chr&gt;     &lt;mth&gt;    &lt;dbl&gt;  &lt;dbl&gt;       &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+##  1 stl    1990 Jan   13256. 13291.       -38.1    3.08          13294.
+##  2 stl    1990 Feb   12966. 13272.      -261.   -44.2           13227.
+##  3 stl    1990 Mar   12938. 13252.      -291.   -23.0           13229.
+##  4 stl    1990 Apr   13012. 13233.      -221.     0.0892        13233.
+##  5 stl    1990 May   13108. 13213.      -115.     9.98          13223.
+##  6 stl    1990 Jun   13183. 13193.       -25.6   15.7           13208.
+##  7 stl    1990 Jul   13170. 13173.       -24.4   22.0           13194.
+##  8 stl    1990 Aug   13160. 13152.       -11.8   19.5           13171.
+##  9 stl    1990 Sep   13113. 13131.       -43.4   25.7           13157.
+## 10 stl    1990 Oct   13185. 13110.        62.5   12.3           13123.
+## # … with 347 more rows
+```
+
+---
+
+## US Retail Employment
+
+
+```r
+us_retail_employment %&gt;%
+  autoplot(Employed, color='gray') +
+  autolayer(components(dcmp), trend, color='red') +
+  xlab("Year") + ylab("Persons (thousands)") +
+  ggtitle("Total employment in US retail")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/dable4-1.png" width="576" /&gt;
+
+---
+
+## US Retail Employment
+
+
+```r
+components(dcmp) %&gt;% autoplot() + xlab("Year")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/usretail-stl-1.png" width="576" /&gt;
+
+---
+
+## US Retail Employment
+
+
+```r
+components(dcmp) %&gt;% gg_subseries(season_year)  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/usretail3-1.png" width="576" /&gt;
+
+---
+
+## Seasonal adjustment
+
+  *  Useful by-product of decomposition:  an easy way to calculate seasonally adjusted data.
+  *  Additive decomposition: seasonally adjusted data given by
+`$$y_t - S_t = T_t + R_t$$`
+  *  Multiplicative decomposition: seasonally adjusted data given by
+`$$y_t / S_t = T_t \times R_t$$`
+
+---
+
+## US Retail Employment
+
+
+```r
+us_retail_employment %&gt;%
+  autoplot(Employed, color='gray') +
+  autolayer(components(dcmp), season_adjust, color='blue') +
+  xlab("Year") + ylab("Persons (thousands)") +
+  ggtitle("Total employment in US retail")  + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/usretail-sa-1.png" width="576" /&gt;
+
+---
+
+## Seasonal adjustment
+
+  * We use estimates of `\(S\)` based on past values to seasonally adjust a current value.
+  *  Seasonally adjusted series reflect **remainders** as well as **trend**. Therefore they are not "smooth" and "downturns" or "upturns" can be misleading.
+  *  It is better to use the trend-cycle component to look for turning points.
+
+---
+
+# History of time series decomposition
+
+---
+
+## History of time series decomposition
+
+  *  Classical method originated in 1920s.
+  *  Census II method introduced in 1957. Basis for X-11 method and variants (including X-12-ARIMA, X-13-ARIMA)
+  *  STL method introduced in 1983
+  *  TRAMO/SEATS introduced in 1990s.
+
+### National Statistics Offices
+ * ABS uses X-12-ARIMA
+ * US Census Bureau uses X-13ARIMA-SEATS
+ * Statistics Canada uses X-12-ARIMA
+ * ONS (UK) uses X-12-ARIMA
+ * EuroStat use X-13ARIMA-SEATS
+
+---
+
+## X-11 decomposition
+
+**Advantages**
+
+  *  Relatively robust to outliers
+  *  Completely automated choices for trend and seasonal changes
+  *  Very widely tested on economic data over a long period of time.
+
+**Disadvantages**
+
+  *  No prediction/confidence intervals
+  *  Ad hoc method with no underlying model
+  *  Only developed for quarterly and monthly data
+
+---
+
+
+```r
+X11_dcmp &lt;- us_retail_employment %&gt;%
+    model(seats = feasts:::X11(Employed, type = "additive")) %&gt;%
+    components()
+X11_dcmp
+```
+
+```
+## # A dable:           357 x 7 [1M]
+## # Key:               .model [1]
+## # X11 Decomposition: Employed = trend + seasonal + irregular
+##    .model    Month Employed  trend seasonal irregular season_adjust
+##    &lt;chr&gt;     &lt;mth&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+##  1 seats  1990 Jan   13256. 13260.   -20.5     16.0          13276.
+##  2 seats  1990 Feb   12966. 13248.  -253.     -29.1          13219.
+##  3 seats  1990 Mar   12938. 13237.  -291.      -7.47         13229.
+##  4 seats  1990 Apr   13012. 13227.  -217.       2.31         13229.
+##  5 seats  1990 May   13108. 13217.  -111.       2.40         13219.
+##  6 seats  1990 Jun   13183. 13204.   -21.0     -0.192        13204.
+##  7 seats  1990 Jul   13170. 13186.   -21.1      5.09         13191.
+##  8 seats  1990 Aug   13160. 13167.    -2.20    -5.18         13162.
+##  9 seats  1990 Sep   13113. 13150.   -33.0     -3.86         13146.
+## 10 seats  1990 Oct   13185. 13136.    52.4     -2.87         13133.
+## # … with 347 more rows
+```
+
+---
+
+
+```r
+autoplot(X11_dcmp) + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-11-1.png" width="576" /&gt;
+
+
+---
+
+## Extensions: X-12-ARIMA and X-13-ARIMA
+
+  *  The X-11, X-12-ARIMA and X-13-ARIMA methods are based on Census II decomposition.
+  *  These allow adjustments for trading days and other explanatory variables.
+  *  Known outliers can be omitted.
+  *  Level shifts and ramp effects can be modelled.
+  *  Missing values estimated and replaced.
+  *  Holiday factors (e.g., Easter, Labour Day) can be estimated.
+
+---
+
+## X-13ARIMA-SEATS
+
+**Advantages**
+
+  * Model-based
+  * Smooth trend estimate
+  * Allows estimates at end points
+  * Allows changing seasonality
+  * Developed for economic data
+
+**Disadvantages**
+
+  *  Only developed for quarterly and monthly data
+
+---
+
+[The details.](https://cran.r-project.org/web/packages/seasonal/vignettes/seas.pdf)
+
+---
+
+
+```r
+seats_dcmp &lt;- us_retail_employment %&gt;%
+    model(seats = feasts:::SEATS(Employed)) %&gt;%
+    components()
+seats_dcmp
+```
+
+```
+## # A dable:                       357 x 7 [1M]
+## # Key:                           .model [1]
+## # X-13ARIMA-SEATS Decomposition: Employed = trend * seasonal * irregular
+##    .model    Month Employed  trend seasonal irregular season_adjust
+##    &lt;chr&gt;     &lt;mth&gt;    &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;     &lt;dbl&gt;         &lt;dbl&gt;
+##  1 seats  1990 Jan   13256. 13265.    0.999     1.00         13269.
+##  2 seats  1990 Feb   12966. 13244.    0.980     0.999        13235.
+##  3 seats  1990 Mar   12938. 13236.    0.977     1.00         13238.
+##  4 seats  1990 Apr   13012. 13232.    0.983     1.00         13234.
+##  5 seats  1990 May   13108. 13221.    0.991     1.00         13222.
+##  6 seats  1990 Jun   13183. 13205.    0.998     1.00         13204.
+##  7 seats  1990 Jul   13170. 13186.    0.999     1.00         13189.
+##  8 seats  1990 Aug   13160. 13165.    1.00      1.00         13162.
+##  9 seats  1990 Sep   13113. 13145.    0.998     1.00         13145.
+## 10 seats  1990 Oct   13185. 13129.    1.00      1.00         13126.
+## # … with 347 more rows
+```
+
+---
+
+
+```r
+autoplot(seats_dcmp) +
+  labs(title = "SEATS decomposition of total US retail employment") + theme_xaringan()
+```
+
+&lt;img src="index_files/figure-html/unnamed-chunk-13-1.png" width="576" /&gt;
+
+---
+
+# STL decomposition
+
+---
+
+## STL decomposition
+
+
+  *  STL: "Seasonal and Trend decomposition using Loess"
+  *  Very versatile and robust.
+  *  Unlike X-12-ARIMA, STL will handle any type of seasonality.
+  *  Seasonal component allowed to change over time, and rate of change controlled by user.
+  *  Smoothness of trend-cycle also controlled by user.
+  *  Robust to outliers
+  *  Not trading day or calendar adjustments.
+  *  Only additive.
+  *  Take logs to get multiplicative decomposition.
+  *  Use Box-Cox transformations to get other decompositions.
+
+---
+
+## STL decomposition
+
+
+
+```r
+us_retail_employment %&gt;%
+  model(STL(Employed ~ season(window=9), robust=TRUE)) %&gt;%
+  components() %&gt;% autoplot() +
+    ggtitle("STL decomposition: US retail employment")
+```
+
+&lt;img src="index_files/figure-html/stlwindow9-1.png" width="576" /&gt;
+
+---
+
+## STL decomposition
+
+
+```
+## NULL
+```
+
+---
+
+## STL decomposition
+
+
+```r
+us_retail_employment %&gt;%
+  model(STL(Employed ~ season(window=5))) %&gt;%
+  components()
+
+us_retail_employment %&gt;%
+  model(STL(Employed ~ trend(window=15) +
+                       season(window="periodic"),
+            robust = TRUE)
+  ) %&gt;% components()
+```
+
+  *  `trend(window = ?)` controls wiggliness of trend component.
+  *  `season(window = ?)` controls variation on seasonal component.
+  *  `season(window = 'periodic')` is equivalent to an infinite window.
+
+---
+
+## STL decomposition
+
+
+```r
+us_retail_employment %&gt;%
+  model(STL(Employed)) %&gt;%
+  components() %&gt;%
+  autoplot()
+```
+
+&lt;img src="index_files/figure-html/mstl-1.png" width="576" /&gt;
+
+* `STL()` chooses `season(window=13)` by default
+* Can include transformations.
+
+---
+
+## STL decomposition
+
+* Algorithm that updates trend and seasonal components iteratively.
+* Starts with `\(\hat{T}_t=0\)`
+* Uses a mixture of loess and moving averages to successively refine the trend and seasonal estimates.
+* The trend window controls loess bandwidth applied to deasonalised values.
+* The season window controls loess bandwidth applied to detrended subseries.
+* Robustness weights based on remainder.
+* Default season `window = 13`
+* Default trend `window = nextodd(ceiling((1.5*period)/(1-(1.5/s.window)))`
+
+---
+
+# When things go wrong
+
+
+---
+
+## The ABS stuff-up
+
+
+
+
+---
+
+
+```r
+employed
+```
+
+```
+## # A tsibble: 440 x 4 [1M]
+##        Time Month  Year Employed
+##       &lt;mth&gt; &lt;ord&gt; &lt;dbl&gt;    &lt;dbl&gt;
+##  1 1978 Feb Feb    1978    5986.
+##  2 1978 Mar Mar    1978    6041.
+##  3 1978 Apr Apr    1978    6054.
+##  4 1978 May May    1978    6038.
+##  5 1978 Jun Jun    1978    6031.
+##  6 1978 Jul Jul    1978    6036.
+##  7 1978 Aug Aug    1978    6005.
+##  8 1978 Sep Sep    1978    6024.
+##  9 1978 Oct Oct    1978    6046.
+## 10 1978 Nov Nov    1978    6034.
+## # … with 430 more rows
+```
+
+
+---
+
+## The ABS stuff-up
+
+[Details:](https://robjhyndman.com/hyndsight/abs-seasonal-adjustment-3/)
+
+
+```r
+employed %&gt;%
+  autoplot(Employed) +
+  ggtitle("Total employed") + ylab("Thousands") + xlab("Year")
+```
+
+&lt;img src="index_files/figure-html/abs3-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+```r
+employed %&gt;%
+  filter(Year &gt;= 2005) %&gt;%
+  autoplot(Employed) +
+  ggtitle("Total employed") + ylab("Thousands") + xlab("Year")
+```
+
+&lt;img src="index_files/figure-html/abs4-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+
+```r
+employed %&gt;%
+  filter(Year &gt;= 2005) %&gt;%
+  gg_season(Employed, label = "right") +
+  ggtitle("Total employed") + ylab("Thousands")
+```
+
+&lt;img src="index_files/figure-html/abs5-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+
+```r
+employed %&gt;%
+  mutate(diff = difference(Employed)) %&gt;%
+  filter(Month == "Sep") %&gt;%
+  ggplot(aes(y = diff, x = 1)) +
+  geom_boxplot() + coord_flip() +
+  ggtitle("Sep - Aug: total employed") +
+  xlab("") + ylab("Thousands") +
+  scale_x_continuous(breaks = NULL, labels = NULL)
+```
+
+&lt;img src="index_files/figure-html/abs6-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+
+```r
+dcmp &lt;- employed %&gt;%
+  filter(Year &gt;= 2005) %&gt;%
+  model(stl = STL(Employed ~ season(window = 11), robust = TRUE))
+components(dcmp) %&gt;% autoplot()
+```
+
+&lt;img src="index_files/figure-html/abs7-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+```r
+components(dcmp) %&gt;%
+  filter(year(Time) == 2013) %&gt;%
+  gg_season(season_year) +
+  ggtitle("Seasonal component") +
+  guides(colour = "none")
+```
+
+&lt;img src="index_files/figure-html/abs8-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+
+
+```r
+components(dcmp) %&gt;%
+  as_tsibble() %&gt;%
+  autoplot(season_adjust)
+```
+
+&lt;img src="index_files/figure-html/abs9-1.png" width="576" /&gt;
+
+---
+
+## The ABS stuff-up
+
+  *  August 2014 employment numbers higher than expected.
+  *  Supplementary survey usually conducted in August for employed people.
+  *  Most likely, some employed people were claiming to be unemployed in August to avoid supplementary questions.
+  *  Supplementary survey not run in 2014, so no motivation to lie about employment.
+  *  In previous years, seasonal adjustment fixed the problem.
+  *  The ABS has now adopted a new method to avoid the bias.
+
+    </textarea>
+<style data-target="print-only">@media screen {.remark-slide-container{display:block;}.remark-slide-scaler{box-shadow:none;}}</style>
+<script src="https://remarkjs.com/downloads/remark-latest.min.js"></script>
+<script>var slideshow = remark.create({
+"highlightStyle": "github",
+"highlightLines": true,
+"countIncrementalSlides": false
+});
+if (window.HTMLWidgets) slideshow.on('afterShowSlide', function (slide) {
+  window.dispatchEvent(new Event('resize'));
+});
+(function(d) {
+  var s = d.createElement("style"), r = d.querySelector(".remark-slide-scaler");
+  if (!r) return;
+  s.type = "text/css"; s.innerHTML = "@page {size: " + r.style.width + " " + r.style.height +"; }";
+  d.head.appendChild(s);
+})(document);
+
+(function(d) {
+  var el = d.getElementsByClassName("remark-slides-area");
+  if (!el) return;
+  var slide, slides = slideshow.getSlides(), els = el[0].children;
+  for (var i = 1; i < slides.length; i++) {
+    slide = slides[i];
+    if (slide.properties.continued === "true" || slide.properties.count === "false") {
+      els[i - 1].className += ' has-continuation';
+    }
+  }
+  var s = d.createElement("style");
+  s.type = "text/css"; s.innerHTML = "@media print { .has-continuation { display: none; } }";
+  d.head.appendChild(s);
+})(document);
+// delete the temporary CSS (for displaying all slides initially) when the user
+// starts to view slides
+(function() {
+  var deleted = false;
+  slideshow.on('beforeShowSlide', function(slide) {
+    if (deleted) return;
+    var sheets = document.styleSheets, node;
+    for (var i = 0; i < sheets.length; i++) {
+      node = sheets[i].ownerNode;
+      if (node.dataset["target"] !== "print-only") continue;
+      node.parentNode.removeChild(node);
+    }
+    deleted = true;
+  });
+})();
+(function() {
+  "use strict"
+  // Replace <script> tags in slides area to make them executable
+  var scripts = document.querySelectorAll(
+    '.remark-slides-area .remark-slide-container script'
+  );
+  if (!scripts.length) return;
+  for (var i = 0; i < scripts.length; i++) {
+    var s = document.createElement('script');
+    var code = document.createTextNode(scripts[i].textContent);
+    s.appendChild(code);
+    var scriptAttrs = scripts[i].attributes;
+    for (var j = 0; j < scriptAttrs.length; j++) {
+      s.setAttribute(scriptAttrs[j].name, scriptAttrs[j].value);
+    }
+    scripts[i].parentElement.replaceChild(s, scripts[i]);
+  }
+})();
+(function() {
+  var links = document.getElementsByTagName('a');
+  for (var i = 0; i < links.length; i++) {
+    if (/^(https?:)?\/\//.test(links[i].getAttribute('href'))) {
+      links[i].target = '_blank';
+    }
+  }
+})();
+// adds .remark-code-has-line-highlighted class to <pre> parent elements
+// of code chunks containing highlighted lines with class .remark-code-line-highlighted
+(function(d) {
+  const hlines = d.querySelectorAll('.remark-code-line-highlighted');
+  const preParents = [];
+  const findPreParent = function(line, p = 0) {
+    if (p > 1) return null; // traverse up no further than grandparent
+    const el = line.parentElement;
+    return el.tagName === "PRE" ? el : findPreParent(el, ++p);
+  };
+
+  for (let line of hlines) {
+    let pre = findPreParent(line);
+    if (pre && !preParents.includes(pre)) preParents.push(pre);
+  }
+  preParents.forEach(p => p.classList.add("remark-code-has-line-highlighted"));
+})(document);</script>
+
+<script>
+slideshow._releaseMath = function(el) {
+  var i, text, code, codes = el.getElementsByTagName('code');
+  for (i = 0; i < codes.length;) {
+    code = codes[i];
+    if (code.parentNode.tagName !== 'PRE' && code.childElementCount === 0) {
+      text = code.textContent;
+      if (/^\\\((.|\s)+\\\)$/.test(text) || /^\\\[(.|\s)+\\\]$/.test(text) ||
+          /^\$\$(.|\s)+\$\$$/.test(text) ||
+          /^\\begin\{([^}]+)\}(.|\s)+\\end\{[^}]+\}$/.test(text)) {
+        code.outerHTML = code.innerHTML;  // remove <code></code>
+        continue;
+      }
+    }
+    i++;
+  }
+};
+slideshow._releaseMath(document);
+</script>
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+(function () {
+  var script = document.createElement('script');
+  script.type = 'text/javascript';
+  script.src  = 'https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML';
+  if (location.protocol !== 'file:' && /^https?:/.test(script.src))
+    script.src  = script.src.replace(/^https?:/, '');
+  document.getElementsByTagName('head')[0].appendChild(script);
+})();
+</script>
+  </body>
+</html>

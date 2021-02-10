@@ -1,0 +1,134 @@
+# This the default config from which all other configurations inherit
+## For a more detailed example of the themes capabilities look at "development/config.toml"
+languageCode = "en-us"
+title = "rww.science"
+baseURL = "https://rww.science"
+theme = "hugo-html5up-alpha"
+disqusShortname = ""
+
+[params]
+  description = ""
+  images = ["images/banner.jpg"]
+  author = "Content: Robert W. Walker; Hugo Port: [Nelson/Roberto](https://nelsonroberto.com/)"
+  copyright = "© RWW"
+  design = "Design: [HTML5 UP](http://html5up.net/)"
+  mainSections = ["blog","courses"]
+  logo = ["images/logo.png"]
+
+
+### Footer Social Media Links ###
+[[params.share]]
+title = "facebook"
+icon = "fa-facebook-f" # fontawesome icons https://fontawesome.com/icons?d=gallery&s=brands
+link = "https://www.facebook.com/"
+
+[[params.share]]
+title = "twitter"
+icon = "fa-twitter"
+link = "https://twitter.com/PieRatio"
+
+[[params.share]]
+title = "linkedin"
+icon = "fa-linkedin"
+link = "https://www.linkedin.com"
+
+#[params]
+#  description = "rww.science"
+#  mainSections = ["post"]
+
+## Markdown Settings
+enableEmoji = true
+[markup.goldmark]
+  [markup.goldmark.extensions]
+    definitionList = true
+    footnote = true
+    linkify = true
+    strikethrough = true
+    table = true
+    taskList = true
+    typographer = true
+  [markup.goldmark.parser]
+    attribute = true
+    autoHeadingID = true
+    autoHeadingIDType = "github"
+  [markup.goldmark.renderer]
+    hardWraps = false
+    unsafe = true
+    xhtml = false
+  [markup.highlight]
+    codeFences = true
+    guessSyntax = false
+    hl_Lines = ""
+    lineNoStart = 1
+    lineNos = false
+    lineNumbersInTable = true
+    noClasses = true
+    style = "bw"
+    tabWidth = 4
+
+
+
+[taxonomies]
+  category = "categories"
+  tag = "tags"
+  series = "series"
+
+[privacy]
+
+  [privacy.vimeo]
+    disabled = false
+    simple = true
+
+  [privacy.twitter]
+    disabled = false
+    enableDNT = true
+    simple = true
+
+  [privacy.instagram]
+    disabled = false
+    simple = true
+
+  [privacy.youtube]
+    disabled = false
+    privacyEnhanced = true
+
+[services]
+
+  [services.twitter]
+    disableInlineCSS = false
+    
+## Menu Settings
+[menu]
+  [[menu.main]]
+    identifier = "blog"
+    name = "Blog"
+    url = "/blog/"
+    weight = 10
+  [[menu.main]]
+    identifier = "courses"
+    name = "Courses"
+    url = "/courses/"
+    weight = 20
+  [[menu.main]]
+    identifier = "taxonomies"
+    name = "Taxonomies"
+    url = "#"
+    weight = 30
+  [[menu.main]]
+    parent = "taxonomies"
+    identifier = "categories"
+    name = "Categories"
+    url = "/categories/"
+    weight = 31
+  [[menu.main]]
+    parent = "taxonomies"
+    identifier = "tags"
+    name = "Tags"
+    url = "/tags/"
+    weight = 31
+  [[menu.main]]
+    parent = "taxonomies"
+    identifier = "series"
+    name = "Series"
+    url = "/series/"
+    weight = 33
