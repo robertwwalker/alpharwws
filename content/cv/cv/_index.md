@@ -1,4 +1,0 @@
----
-title: Curriculum Vitae
----
-
